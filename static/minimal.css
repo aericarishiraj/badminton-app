@@ -1,0 +1,274 @@
+/* Minimalistic UI for Badminton App */
+
+body {
+    background: #f9f9f9;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #222;
+    margin: 0;
+    padding: 0;
+}
+
+.container, .container-fluid {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    padding: 32px 24px;
+    margin-top: 32px;
+    margin-bottom: 32px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 16px;
+}
+
+.card, .kpi-card, .metric-card, .stats-card, .main-container, .rankings-section, .network-section {
+    background: #fafbfc;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    border: 1px solid #ececec;
+    margin-bottom: 24px;
+    padding: 20px 18px;
+}
+
+.card-header, .card .card-header, .kpi-section-header {
+    background: none;
+    border-bottom: 1px solid #ececec;
+    font-weight: 500;
+    color: #222;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+}
+
+.btn, .btn-primary, .btn-success, .btn-outline-secondary {
+    border-radius: 6px;
+    font-weight: 500;
+    padding: 8px 20px;
+    box-shadow: none;
+    border: none;
+    background: #2563eb;
+    color: #fff;
+    transition: background 0.2s;
+}
+.btn:hover, .btn:focus {
+    background: #1d4ed8;
+    color: #fff;
+}
+.btn-outline-secondary {
+    background: #fff;
+    color: #2563eb;
+    border: 1px solid #2563eb;
+}
+.btn-outline-secondary:hover {
+    background: #2563eb;
+    color: #fff;
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #222;
+    background: none;
+    font-weight: 500;
+}
+.nav-tabs .nav-link.active {
+    border-bottom: 2px solid #2563eb;
+    color: #2563eb;
+    background: none;
+}
+
+.table {
+    background: #fff;
+    border-radius: 6px;
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    margin-bottom: 24px;
+}
+.table th, .table td {
+    border: none;
+    padding: 10px 12px;
+    text-align: left;
+}
+.table-striped tbody tr:nth-of-type(odd) {
+    background: #f5f7fa;
+}
+
+.form-control, select, input, textarea {
+    border-radius: 6px;
+    border: 1px solid #ececec;
+    background: #fff;
+    color: #222;
+    padding: 8px 12px;
+    font-size: 1em;
+}
+
+label {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.alert, .alert-info {
+    background: #f1f5f9;
+    color: #2563eb;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+}
+
+.list-group-item {
+    background: #fff;
+    border: none;
+    color: #222;
+    padding: 10px 14px;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+    background: #e0e0e0;
+    border-radius: 4px;
+}
+
+/* Remove gradients, heavy shadows, colored backgrounds, and excessive icons */
+/* Use only subtle, clean, and modern UI elements */
+
+/* Rankings Table Styles */
+.rankings-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+.rankings-table th {
+    background: #f1f5f9;
+    color: #2563eb;
+    font-weight: 600;
+    padding: 14px 12px;
+    border-bottom: 1px solid #ececec;
+}
+.rankings-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+.rankings-table tr:last-child td {
+    border-bottom: none;
+}
+
+.rank-badge {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 32px;
+    font-weight: bold;
+    color: #fff;
+    font-size: 1rem;
+    background: #2563eb;
+}
+.rank-1 { background: #ffd700; color: #222; }
+.rank-2 { background: #c0c0c0; color: #222; }
+.rank-3 { background: #cd7f32; color: #fff; }
+.rank-other { background: #2563eb; }
+
+.stats-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.stat-card {
+    flex: 1 1 180px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    padding: 18px 12px;
+    text-align: center;
+    min-width: 160px;
+}
+.stat-card h3 {
+    font-size: 2rem;
+    margin-bottom: 6px;
+    color: #2563eb;
+}
+.stat-card p {
+    color: #666;
+    font-size: 1rem;
+    margin-bottom: 0;
+}
+
+.main-container {
+    max-width: 1100px;
+    margin: 32px auto;
+    padding: 32px 18px;
+}
+
+.back-button {
+    display: inline-block;
+    margin: 18px 0 0 18px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 24px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    transition: background 0.2s;
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    z-index: 10;
+}
+.back-button:hover {
+    background: #1d4ed8;
+    color: #fff;
+}
+
+.network-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    margin: 0 auto;
+    display: block;
+}
+
+@media (max-width: 900px) {
+    .main-container {
+        padding: 18px 4px;
+    }
+    .stats-cards {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .stat-card {
+        min-width: 0;
+    }
+}
+@media (max-width: 600px) {
+    .main-container {
+        padding: 8px 0;
+    }
+    .back-button {
+        padding: 6px 12px;
+        font-size: 0.95rem;
+        top: 8px;
+        left: 8px;
+    }
+    .rankings-table th, .rankings-table td {
+        padding: 8px 4px;
+        font-size: 0.95rem;
+    }
+} 
