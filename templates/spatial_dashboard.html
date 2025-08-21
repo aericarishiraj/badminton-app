@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spatial Analysis Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/minimal.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mt-3">{{ tournament }}</h2>
+                <h3 class="text-muted">{{ player_a }} vs {{ player_b }}</h3>
+                
+                <!-- Filters Section -->
+                <div class="filter-section">
+                    <h5>Filters</h5>
+                    <div class="row filter-row">
+                        <div class="col-md-3">
+                            <label for="setSelect">Set Number:</label>
+                            <select id="setSelect" class="form-control">
+                                <option value="">All Sets</option>
+                                <option value="1">Set 1</option>
+                                <option value="2">Set 2</option>
+                                <option value="3">Set 3</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="errorTypeSelect">Error Type:</label>
+                            <select id="errorTypeSelect" class="form-control">
+                                <option value="">All Errors</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="shotTypeSelect">Shot Type:</label>
+                            <select id="shotTypeSelect" class="form-control">
+                                <option value="">All Shot Types</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="serveTypeSelect">Serve Type:</label>
+                            <select id="serveTypeSelect" class="form-control">
+                                <option value="">All Serve Types</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Spatial Analysis Charts -->
+                <div class="row">
+                    <!-- 1. Shot Landing Heatmap -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6>1. Shot Landing Heatmap</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="shotHeatmap" class="chart-container">
+                                    <p class="text-muted">Loading shot landing heatmap...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Serve & Return Placement -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6>2. Serve & Return Placement</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="serveReturnPlacement" class="chart-container">
+                                    <p class="text-muted">Loading serve & return placement...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- 3. Error Zone Map -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6>3. Error Zone Map</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="errorZoneMap" class="chart-container">
+                                    <p class="text-muted">Loading error zone map...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Movement Density Heatmap -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6>4. Movement Density Heatmap</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="movementDensityHeatmap" class="chart-container">
+                                    <p class="text-muted">Loading movement density heatmap...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- 5. Opponent Trap Zones -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6>5. Opponent Trap Zones</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="opponentTrapZones" class="chart-container">
+                                    <p class="text-muted">Loading opponent trap zones...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 6. Shot Type Spatial Signature -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6>6. Shot Type Spatial Signature</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="shotTypeSpatialSignature" class="chart-container">
+                                    <p class="text-muted">Loading shot type spatial signature...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- 7. Rally End Zone -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6>7. Rally End Zone</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="rallyEndZone" class="chart-container">
+                                    <p class="text-muted">Loading rally end zone...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a href="/" class="btn btn-primary">← Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        // Global variables
+        let currentFilters = {
+            player: '{{ player_a }}',
+            opponent: '{{ player_b }}',
+            tournament: '{{ tournament }}',
+            round: '{{ round }}',
+            set_number: '',
+            error_type: '',
+            shot_type: '',
+            serve_type: ''
+        };
+
+        // Initialize all charts
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllCharts();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            document.getElementById('setSelect').addEventListener('change', function() {
+                currentFilters.set_number = this.value;
+                loadAllCharts();
+            });
+
+            document.getElementById('errorTypeSelect').addEventListener('change', function() {
+                currentFilters.error_type = this.value;
+                loadErrorZoneMap();
+            });
+
+            document.getElementById('shotTypeSelect').addEventListener('change', function() {
+                currentFilters.shot_type = this.value;
+                loadShotTypeSpatialSignature();
+            });
+
+            document.getElementById('serveTypeSelect').addEventListener('change', function() {
+                currentFilters.serve_type = this.value;
+                loadServeReturnPlacement();
+            });
+        }
+
+        function loadAllCharts() {
+            loadShotHeatmap();
+            loadServeReturnPlacement();
+            loadErrorZoneMap();
+            loadMovementDensityHeatmap();
+            loadOpponentTrapZones();
+            loadShotTypeSpatialSignature();
+            loadRallyEndZone();
+        }
+
+        function loadShotHeatmap() {
+            const url = `/shot_heatmap?${new URLSearchParams(currentFilters)}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.landing_x && data.landing_x.length > 0) {
+                        const trace = {
+                            x: data.landing_x,
+                            y: data.landing_y,
+                            type: 'histogram2d',
+                            nbinsx: 20,
+                            nbinsy: 20,
+                            colorscale: 'Viridis'
+                        };
+                        
+                        const layout = {
+                            title: 'Shot Landing Heatmap',
+                            xaxis: { title: 'X Position (m)' },
+                            yaxis: { title: 'Y Position (m)' },
+                            width: 400,
+                            height: 300
+                        };
+                        
+                        Plotly.newPlot('shotHeatmap', [trace], layout);
+                    } else {
+                        document.getElementById('shotHeatmap').innerHTML = '<p class="text-muted">No data available</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading shot heatmap:', error);
+                    document.getElementById('shotHeatmap').innerHTML = '<p class="text-danger">Error loading data</p>';
+                });
+        }
+
+        function loadServeReturnPlacement() {
+            const url = `/serve_return_placement?${new URLSearchParams(currentFilters)}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.serve_x && data.serve_x.length > 0) {
+                        const serveTrace = {
+                            x: data.serve_x,
+                            y: data.serve_y,
+                            mode: 'markers',
+                            type: 'scatter',
+                            name: 'Serve',
+                            marker: { color: 'blue', size: 8 }
+                        };
+                        
+                        const returnTrace = {
+                            x: data.return_x,
+                            y: data.return_y,
+                            mode: 'markers',
+                            type: 'scatter',
+                            name: 'Return',
+                            marker: { color: 'red', size: 8 }
+                        };
+                        
+                        const layout = {
+                            title: 'Serve & Return Placement',
+                            xaxis: { title: 'X Position (m)' },
+                            yaxis: { title: 'Y Position (m)' },
+                            width: 400,
+                            height: 300
+                        };
+                        
+                        Plotly.newPlot('serveReturnPlacement', [serveTrace, returnTrace], layout);
+                    } else {
+                        document.getElementById('serveReturnPlacement').innerHTML = '<p class="text-muted">No data available</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading serve return placement:', error);
+                    document.getElementById('serveReturnPlacement').innerHTML = '<p class="text-danger">Error loading data</p>';
+                });
+        }
+
+        function loadErrorZoneMap() {
+            const url = `/error_zone_map?${new URLSearchParams(currentFilters)}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error_x && data.error_x.length > 0) {
+                        const trace = {
+                            x: data.error_x,
+                            y: data.error_y,
+                            mode: 'markers',
+                            type: 'scatter',
+                            marker: { 
+                                color: data.error_types,
+                                colorscale: 'Reds',
+                                size: 10
+                            },
+                            text: data.error_types
+                        };
+                        
+                        const layout = {
+                            title: 'Error Zone Map',
+                            xaxis: { title: 'X Position (m)' },
+                            yaxis: { title: 'Y Position (m)' },
+                            width: 400,
+                            height: 300
+                        };
+                        
+                        Plotly.newPlot('errorZoneMap', [trace], layout);
+                    } else {
+                        document.getElementById('errorZoneMap').innerHTML = '<p class="text-muted">No data available</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading error zone map:', error);
+                    document.getElementById('errorZoneMap').innerHTML = '<p class="text-danger">Error loading data</p>';
+                });
+        }
+
+        function loadMovementDensityHeatmap() {
+            const url = `/movement_density_heatmap?${new URLSearchParams(currentFilters)}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.movement_x && data.movement_x.length > 0) {
+                        const trace = {
+                            x: data.movement_x,
+                            y: data.movement_y,
+                            type: 'histogram2d',
+                            nbinsx: 20,
+                            nbinsy: 20,
+                            colorscale: 'Blues'
+                        };
+                        
+                        const layout = {
+                            title: 'Movement Density Heatmap',
+                            xaxis: { title: 'X Position (m)' },
+                            yaxis: { title: 'Y Position (m)' },
+                            width: 400,
+                            height: 300
+                        };
+                        
+                        Plotly.newPlot('movementDensityHeatmap', [trace], layout);
+                    } else {
+                        document.getElementById('movementDensityHeatmap').innerHTML = '<p class="text-muted">No data available</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading movement density heatmap:', error);
+                    document.getElementById('movementDensityHeatmap').innerHTML = '<p class="text-danger">Error loading data</p>';
+                });
+        }
+
+        function loadOpponentTrapZones() {
+            const url = `/opponent_trap_zones?${new URLSearchParams(currentFilters)}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.trap_x && data.trap_x.length > 0) {
+                        const trace = {
+                            x: data.trap_x,
+                            y: data.trap_y,
+                            mode: 'markers',
+                            type: 'scatter',
+                            marker: { 
+                                color: 'purple',
+                                size: 12,
+                                opacity: 0.7
+                            }
+                        };
+                        
+                        const layout = {
+                            title: 'Opponent Trap Zones',
+                            xaxis: { title: 'X Position (m)' },
+                            yaxis: { title: 'Y Position (m)' },
+                            width: 400,
+                            height: 300
+                        };
+                        
+                        Plotly.newPlot('opponentTrapZones', [trace], layout);
+                    } else {
+                        document.getElementById('opponentTrapZones').innerHTML = '<p class="text-muted">No data available</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading opponent trap zones:', error);
+                    document.getElementById('opponentTrapZones').innerHTML = '<p class="text-danger">Error loading data</p>';
+                });
+        }
+
+        function loadShotTypeSpatialSignature() {
+            const url = `/shot_type_spatial_signature?${new URLSearchParams(currentFilters)}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.shot_x && data.shot_x.length > 0) {
+                        const trace = {
+                            x: data.shot_x,
+                            y: data.shot_y,
+                            mode: 'markers',
+                            type: 'scatter',
+                            marker: { 
+                                color: data.shot_types,
+                                colorscale: 'Viridis',
+                                size: 10
+                            },
+                            text: data.shot_types
+                        };
+                        
+                        const layout = {
+                            title: 'Shot Type Spatial Signature',
+                            xaxis: { title: 'X Position (m)' },
+                            yaxis: { title: 'Y Position (m)' },
+                            width: 400,
+                            height: 300
+                        };
+                        
+                        Plotly.newPlot('shotTypeSpatialSignature', [trace], layout);
+                    } else {
+                        document.getElementById('shotTypeSpatialSignature').innerHTML = '<p class="text-muted">No data available</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading shot type spatial signature:', error);
+                    document.getElementById('shotTypeSpatialSignature').innerHTML = '<p class="text-danger">Error loading data</p>';
+                });
+        }
+
+        function loadRallyEndZone() {
+            const url = `/rally_end_zone?${new URLSearchParams(currentFilters)}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.rally_x && data.rally_x.length > 0) {
+                        const trace = {
+                            x: data.rally_x,
+                            y: data.rally_y,
+                            mode: 'markers',
+                            type: 'scatter',
+                            marker: { 
+                                color: data.rally_winners,
+                                colorscale: 'RdYlGn',
+                                size: 10
+                            },
+                            text: data.rally_winners
+                        };
+                        
+                        const layout = {
+                            title: 'Rally End Zone',
+                            xaxis: { title: 'X Position (m)' },
+                            yaxis: { title: 'Y Position (m)' },
+                            width: 400,
+                            height: 300
+                        };
+                        
+                        Plotly.newPlot('rallyEndZone', [trace], layout);
+                    } else {
+                        document.getElementById('rallyEndZone').innerHTML = '<p class="text-muted">No data available</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading rally end zone:', error);
+                    document.getElementById('rallyEndZone').innerHTML = '<p class="text-danger">Error loading data</p>';
+                });
+        }
+    </script>
+</body>
+</html>

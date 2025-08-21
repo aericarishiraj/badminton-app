@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smashlytics – Position Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/minimal.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="p-4">
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="comparison-header text-center">
+                    <h2><i class="fas fa-chart-radar"></i> Overall Player Performance Analysis</h2>
+                    <p class="mb-0">Comprehensive performance comparison against all players in the dataset</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Player Selection -->
+        <div class="row mb-4">
+            <div class="col-md-6 offset-md-3">
+                <div class="form-group">
+                    <label for="targetPlayer"><strong>Select Player for Analysis</strong></label>
+                    <select class="form-control" id="targetPlayer">
+                        <option value="">Select Player</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analyze Button -->
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <button id="analyzeBtn" class="btn btn-success btn-lg" disabled>
+                    <i class="fas fa-chart-bar"></i> Analyze Overall Performance
+                </button>
+            </div>
+        </div>
+
+        <!-- Radar Chart -->
+        <div class="row mb-4" id="radarChartContainer" style="display: none;">
+            <div class="col-12">
+                <div class="alert alert-info" role="alert">
+                    <strong>Performance Radar Chart:</strong> Identifies whether the player outperforms the average across dimensions like scoring and consistency.
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-radar"></i> Performance Radar Chart vs Average Player</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="radar-container">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overall Comparison Results -->
+        <div class="row mb-4" id="overallResultsContainer" style="display: none;">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 id="overallPlayerName">Player Overall Performance</h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Performance Summary -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="metric-card text-center">
+                                    <div class="metric-value" id="overallMatches">-</div>
+                                    <div class="metric-label">Total Matches</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="metric-card text-center">
+                                    <div class="metric-value" id="overallWins">-</div>
+                                    <div class="metric-label">Total Wins</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="metric-card text-center">
+                                    <div class="metric-value" id="overallWinRate">-</div>
+                                    <div class="metric-label">Win Rate %</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="metric-card text-center">
+                                    <div class="metric-value" id="overallPoints">-</div>
+                                    <div class="metric-label">Total Rallies</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rankings -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="alert alert-info" role="alert">
+                                    <strong>Performance Rankings:</strong> Highlights how the player ranks across key performance metrics in comparison to peers.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Performance Rankings</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Metric</th>
+                                                <th>Rank</th>
+                                                <th>Percentile</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="rankingsTable">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Top Players Comparison</h5>
+                                <div id="topPlayersComparison">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shot Type Profile Section -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="alert alert-info" role="alert">
+                    <strong>Shot Type Profile:</strong> Reveals tactical tendencies – whether a player relies more on aggressive shots (e.g., smashes) or control shots (e.g., net).
+                </div>
+            </div>
+        </div>
+        <div class="card mb-4" id="shotTypeProfileCard">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"> Shot Type Profile</h5>
+
+            </div>
+            <div class="card-body">
+                <canvas id="shotTypeProfileChart" height="300"></canvas>
+            </div>
+        </div>
+
+        <!-- Serve vs Rally Efficiency Section -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="alert alert-info" role="alert">
+                    <strong>Serve vs Rally Efficiency:</strong> Shows whether the player performs better when initiating play (serve) or during open rallies.
+                </div>
+            </div>
+        </div>
+        <div class="card mb-4" id="serveRallyEfficiencyCard">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"> Serve vs Rally Point Efficiency</h5>
+                
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <canvas id="serveRallyEfficiencyChart" height="250"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="metric-card text-center">
+                                    <div class="metric-value" id="serveEfficiency">-</div>
+                                    <div class="metric-label">Serve Points Won %</div>
+                                    <small id="servePointsDetail">-</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="metric-card text-center">
+                                    <div class="metric-value" id="rallyEfficiency">-</div>
+                                    <div class="metric-label">Rally Points Won %</div>
+                                    <small id="rallyPointsDetail">-</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <div class="alert alert-info">
+                                <strong>Interpretation:</strong><br>
+                                <small>
+                                    • <strong>Higher Serve %</strong>: Strong offensive serve game<br>
+                                    • <strong>Higher Rally %</strong>: Strong defensive/rally game<br>
+                                    • <strong>Balanced</strong>: Well-rounded player
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back to Main -->
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <a href="/" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Match Selector
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <script>
+        let radarChart = null;
+        let allPlayers = [];
+
+        // Load players on page load
+        $(document).ready(function() {
+            loadPlayers();
+            setupEventListeners();
+            initializeShotTypeProfileChart();
+            initializeServeRallyEfficiencyChart();
+        });
+
+        function loadPlayers() {
+            $.getJSON('/get_all_players', function(data) {
+                allPlayers = data;
+                populatePlayerSelects();
+            });
+        }
+
+        function populatePlayerSelects() {
+            const select = $('#targetPlayer');
+            select.empty().append('<option value="">Select Player</option>');
+            allPlayers.forEach(player => {
+                select.append(`<option value="${player}">${player}</option>`);
+            });
+            
+            // Set Viktor AXELSEN as default and trigger analysis
+            select.val('Viktor AXELSEN');
+            $('#analyzeBtn').prop('disabled', false);
+            
+            // Trigger the analysis automatically
+            analyzeOverallPerformance();
+            fetchShotTypeProfile('Viktor AXELSEN');
+            fetchServeRallyEfficiency('Viktor AXELSEN');
+        }
+
+        function setupEventListeners() {
+            // Enable/disable analyze button based on player selection
+            $('#targetPlayer').on('change', function() {
+                const targetPlayer = $(this).val();
+                $('#analyzeBtn').prop('disabled', !targetPlayer);
+                // Update shot type profile immediately on player change
+                if (targetPlayer) {
+                    fetchShotTypeProfile(targetPlayer);
+                    fetchServeRallyEfficiency(targetPlayer);
+                }
+            });
+
+            // Analyze button click
+            $('#analyzeBtn').on('click', function() {
+                analyzeOverallPerformance();
+            });
+        }
+
+        function analyzeOverallPerformance() {
+            const targetPlayer = $('#targetPlayer').val();
+
+            if (!targetPlayer) {
+                alert('Please select a player');
+                return;
+            }
+
+            console.log('Analyzing overall performance for:', targetPlayer);
+
+            // Show loading state
+            $('#analyzeBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Analyzing...');
+
+            // Make API call
+            $.getJSON('/overall_player_comparison', {
+                player: targetPlayer
+            })
+            .done(function(data) {
+                console.log('Received overall data:', data);
+                updateOverallResults(data);
+                updateRadarChart(data);
+                $('#overallResultsContainer').show();
+                $('#radarChartContainer').show();
+            })
+            .fail(function(xhr, status, error) {
+                console.error('API call failed:', xhr, status, error);
+                alert('Error loading overall comparison data: ' + error);
+            })
+            .always(function() {
+                $('#analyzeBtn').prop('disabled', false).html('<i class="fas fa-chart-bar"></i> Analyze Overall Performance');
+            });
+        }
+
+        function updateRadarChart(data) {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (radarChart) {
+                radarChart.destroy();
+            }
+
+            // Calculate normalized values for radar chart (player vs average)
+            const playerStats = data.target_stats;
+            const avgStats = data.average_stats;
+            
+            const labels = ['Matches Played', 'Wins', 'Win Rate %', 'Rallies Won'];
+            const playerValues = [
+                (playerStats.matches_played / avgStats.matches_played) * 100,
+                (playerStats.wins / avgStats.wins) * 100,
+                playerStats.win_rate, // Already a percentage
+                (playerStats.points_won / avgStats.points_won) * 100
+            ];
+            
+            const avgValues = [100, 100, avgStats.win_rate, 100]; // Average is baseline
+
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: data.target_player,
+                            data: playerValues,
+                            backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                            borderColor: 'rgba(102, 126, 234, 1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(102, 126, 234, 1)'
+                        },
+                        {
+                            label: 'Average Player',
+                            data: avgValues,
+                            backgroundColor: 'rgba(245, 87, 108, 0.2)',
+                            borderColor: 'rgba(245, 87, 108, 1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(245, 87, 108, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(245, 87, 108, 1)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: Math.max(...playerValues, ...avgValues) * 1.2,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Player Performance vs Average Player'
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateOverallResults(data) {
+            console.log('Updating overall results with data:', data);
+            
+            // Update player name
+            $('#overallPlayerName').text(data.target_player + ' - Overall Performance');
+            
+            // Update summary stats
+            $('#overallMatches').text(data.target_stats.matches_played);
+            $('#overallWins').text(data.target_stats.wins);
+            $('#overallWinRate').text(data.target_stats.win_rate + '%');
+            $('#overallPoints').text(data.target_stats.points_won);
+            
+            // Update rankings table
+            const rankingsTable = $('#rankingsTable');
+            rankingsTable.empty();
+            
+            const metrics = [
+                { key: 'matches_played', label: 'Matches Played' },
+                { key: 'wins', label: 'Wins' },
+                { key: 'win_rate', label: 'Win Rate' },
+                { key: 'points_won', label: 'Rallies Won' }
+            ];
+            
+            metrics.forEach(metric => {
+                const ranking = data.target_rankings[metric.key];
+                if (ranking) {
+                    rankingsTable.append(`
+                        <tr>
+                            <td>${metric.label}</td>
+                            <td>${ranking.rank} / ${ranking.total_players}</td>
+                            <td>${ranking.percentile}%</td>
+                        </tr>
+                    `);
+                }
+            });
+            
+            // Update top players comparison
+            const topPlayersDiv = $('#topPlayersComparison');
+            topPlayersDiv.empty();
+            
+            Object.keys(data.top_players).forEach(metric => {
+                const topPlayers = data.top_players[metric];
+                const metricLabel = metric.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                
+                let html = `<h6>${metricLabel}</h6><ul class="list-group list-group-flush">`;
+                
+                // Add top 5 players
+                topPlayers.forEach(player => {
+                    const isTarget = player.name === data.target_player;
+                    const badgeClass = isTarget ? 'badge-success' : 'badge-secondary';
+                    html += `
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="badge badge-dark mr-2">#${player.rank}</span>
+                            ${player.name} ${isTarget ? '<span class="badge badge-primary">Selected</span>' : ''}
+                            <span class="badge ${badgeClass} badge-pill">${player.value}</span>
+                        </li>
+                    `;
+                });
+                
+                // Check if selected player is not in top 5, add them separately
+                const targetPlayerInTop5 = topPlayers.some(player => player.name === data.target_player);
+                if (!targetPlayerInTop5) {
+                    const targetRanking = data.target_rankings[metric];
+                    const targetValue = data.target_stats[metric];
+                    if (targetRanking && targetValue !== undefined) {
+                        html += `
+                            <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: #f8f9fa; border-left: 4px solid #28a745;">
+                                <span class="badge badge-dark mr-2">#${targetRanking.rank}</span>
+                                <strong>${data.target_player} <span class="badge badge-primary">Selected</span></strong>
+                                <span class="badge badge-success badge-pill">${targetValue}</span>
+                            </li>
+                        `;
+                    }
+                }
+                
+                html += '</ul>';
+                topPlayersDiv.append(html);
+            });
+            
+            console.log('Overall results updated');
+        }
+
+        // Shot Type Profile Chart
+        let shotTypeProfileChart = null;
+        
+        function initializeShotTypeProfileChart() {
+            const ctx = document.getElementById('shotTypeProfileChart').getContext('2d');
+            shotTypeProfileChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Select a player to see shot type profile'],
+                    datasets: [{
+                        label: 'Count',
+                        data: [0],
+                        backgroundColor: ['#e9ecef'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Shot Type Profile'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function fetchShotTypeProfile(player) {
+            $.getJSON('/shot_type_profile', { player: player }, function (data) {
+                const labels = Object.keys(data);
+                const values = Object.values(data);
+                
+                // Update the chart
+                const ctx = document.getElementById('shotTypeProfileChart').getContext('2d');
+                if (shotTypeProfileChart) {
+                    shotTypeProfileChart.destroy();
+                }
+                shotTypeProfileChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Count',
+                            data: values,
+                            backgroundColor: [
+                                '#007bff', '#28a745', '#ffc107', '#17a2b8', '#e83e8c'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: {
+                                display: true,
+                                text: 'Shot Type Profile'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                ticks: { precision: 0 }
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
+        // Serve vs Rally Efficiency Chart
+        let serveRallyEfficiencyChart = null;
+        
+        function initializeServeRallyEfficiencyChart() {
+            const ctx = document.getElementById('serveRallyEfficiencyChart').getContext('2d');
+            serveRallyEfficiencyChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Select a player to see efficiency data'],
+                    datasets: [{
+                        data: [1],
+                        backgroundColor: ['#e9ecef'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Serve vs Rally Efficiency'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function fetchServeRallyEfficiency(player) {
+            $.getJSON('/serve_vs_rally_efficiency', { player: player }, function (data) {
+                // Update metrics
+                $('#serveEfficiency').text(data.serve_efficiency + '%');
+                $('#rallyEfficiency').text(data.rally_efficiency + '%');
+                $('#servePointsDetail').text(`${data.serve_points_won}/${data.serve_points_total} points`);
+                $('#rallyPointsDetail').text(`${data.rally_points_won}/${data.rally_points_total} points`);
+                
+                // Update chart
+                const ctx = document.getElementById('serveRallyEfficiencyChart').getContext('2d');
+                if (serveRallyEfficiencyChart) {
+                    serveRallyEfficiencyChart.destroy();
+                }
+                
+                serveRallyEfficiencyChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Serve Points Won', 'Serve Points Lost', 'Rally Points Won', 'Rally Points Lost'],
+                        datasets: [{
+                            data: [
+                                data.serve_points_won,
+                                data.serve_points_total - data.serve_points_won,
+                                data.rally_points_won,
+                                data.rally_points_total - data.rally_points_won
+                            ],
+                            backgroundColor: [
+                                '#28a745',  // Serve won - green
+                                '#dc3545',  // Serve lost - red
+                                '#17a2b8',  // Rally won - blue
+                                '#ffc107'   // Rally lost - yellow
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 20,
+                                    usePointStyle: true
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Serve vs Rally Efficiency'
+                            }
+                        }
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html> 

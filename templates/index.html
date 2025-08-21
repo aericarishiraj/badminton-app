@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smashlytics – Match Selector</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/minimal.css">
+</head>
+<body class="p-4">
+
+    <div class="container">
+        <h2 class="mb-4 text-center">Smashlytics – Match Explorer</h2>
+        
+        <!-- Navigation Links -->
+        <div class="text-center mb-4">
+            <a href="/rankings" class="btn btn-success">
+                <i class="fas fa-trophy"></i> Player Ranking
+            </a>
+        </div>
+
+        <form id="matchForm" method="POST" action="/dashboard">
+            <!-- Player, Opponent, Tournament -->
+            <!-- Player -->
+            <div class="form-row mb-3">
+                <div class="col">
+                    <label for="player">Player</label>
+                    <select class="form-control" id="player" name="player" required>
+                        <option value="">Select Player</option>
+                        {% for p in players %}
+                            <option value="{{ p }}">{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <!-- Opponent -->
+                <div class="col">
+                    <label for="opponent">Opponent</label>
+                    <select class="form-control" id="opponent" name="opponent" required>
+                        <option value="">Select Opponent</option>
+                    </select>
+                </div>
+                <!-- Tournament -->
+                <div class="col">
+                    <label for="tournament">Tournament</label>
+                    <select class="form-control" id="tournament" name="tournament" required>
+                        <option value="">Select Tournament</option>
+                        {% for t in tournaments %}
+                            <option value="{{ t }}">{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Year and Round -->
+            <!-- Round -->
+            <div class="form-row mb-3">
+                <div class="col">
+                    <label for="round">Round</label>
+                    <select class="form-control" id="round" name="round" required>
+                        <option value="">Select Round</option>
+                    </select>
+                </div>
+                <!-- Sets -->
+                <div class="col">
+                    <label for="sets">Sets</label>
+                    <select multiple class="form-control" id="sets" name="sets" required>
+                        <option value="1">Set 1</option>
+                        <option value="2">Set 2</option>
+                        <option value="3">Set 3</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Match Summary Box -->
+            <!-- Winner and Loser -->
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5>Match Summary</h5>
+                    <p><strong>Winner:</strong> <span id="winner">---</span></p>
+                    <p><strong>Loser:</strong> <span id="loser">---</span></p>
+                    <hr>
+                    <h6>Rally Statistics</h6>
+                    <p><strong>Average Rallies per Set:</strong> <span id="avgRallies">33.0</span></p>
+                    <p><strong><span id="winnerName">Player A</span> Win Rate:</strong> <span id="winnerWinRate">51.52%</span></p>
+                    <p><strong><span id="loserName">Player B</span> Win Rate:</strong> <span id="loserWinRate">48.48%</span></p>
+                    
+                    <!-- Dashboard Buttons -->
+                    <div class="mt-4">
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="submit" class="btn btn-primary rounded-pill px-4">Spatial Analysis</button>
+                            <button type="submit" formaction="/dashboard/kpi" class="btn btn-outline-secondary rounded-pill px-4">Key Performance Indicators</button>
+                            <button type="submit" formaction="/dashboard/rally" class="btn btn-outline-secondary rounded-pill px-4">Recommendations</button>
+                            <button type="submit" formaction="/dashboard/shot" class="btn btn-outline-secondary rounded-pill px-4">Overall Excel Data (for preview)</button>
+                            <a href="/dashboard/position" class="btn btn-outline-secondary rounded-pill px-4">Player Performance Evaluation</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hidden Match Field -->
+            <!-- Match -->
+            <input type="hidden" name="match" id="match">
+        </form>
+    </div>
+
+    <!-- Scripts -->
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- JavaScript -->
+    <script>
+        //This is the function that gets the opponents for a given player
+        $('#player').on('change', function () {
+            const player = $(this).val();
+            $('#opponent').empty().append('<option>Loading...</option>');
+            $('#tournament').empty().append('<option value="">Select Tournament</option>');
+            $('#round').empty().append('<option value="">Select Round</option>');
+            $('#winner').text('---');
+            $('#loser').text('---');
+            $('#winnerName').text('Player A');
+            $('#loserName').text('Player B');
+            $('#match').val('');
+            updateMatchStats();
+
+            if (player) {
+                $.getJSON('/get_opponents', { player: player }, function (data) {
+                    $('#opponent').empty().append('<option value="">Select Opponent</option>');
+                    data.forEach(function (opponent) {
+                        $('#opponent').append(`<option value="${opponent}">${opponent}</option>`);
+                    });
+                });
+            } else {
+                $('#opponent').empty().append('<option value="">Select Opponent</option>');
+            }
+        });
+
+        //This is the function that gets the tournaments for a given player and opponent
+        $('#opponent').on('change', function () {
+            const player = $('#player').val();
+            const opponent = $(this).val();
+            
+            $('#tournament').empty().append('<option>Loading...</option>');
+            $('#round').empty().append('<option value="">Select Round</option>');
+            $('#winner').text('---');
+            $('#loser').text('---');
+            $('#match').val('');
+            updateMatchStats();
+
+            if (player && opponent) {
+                // Get tournaments for this specific match
+                $.getJSON('/get_tournaments', { player: player, opponent: opponent }, function (data) {
+                    $('#tournament').empty().append('<option value="">Select Tournament</option>');
+                    data.forEach(function (tournament) {
+                        $('#tournament').append(`<option value="${tournament}">${tournament}</option>`);
+                    });
+                });
+                
+                $('#winner').text(player);  // default
+                $('#loser').text(opponent);
+                $('#winnerName').text(player);  // Player A (winner)
+                $('#loserName').text(opponent);  // Player B (loser)
+                $('#match').val(`${player} vs ${opponent}`);
+            } else {
+                $('#tournament').empty().append('<option value="">Select Tournament</option>');
+            }
+        });
+
+        //This is the function that gets the rounds for a given player and opponent and tournament
+        $('#tournament').on('change', function () {
+            const player = $('#player').val();
+            const opponent = $('#opponent').val();
+            const tournament = $(this).val();
+            
+            $('#round').empty().append('<option>Loading...</option>');
+            updateMatchStats();
+
+            if (player && opponent && tournament) {
+                // Get rounds for this specific match and tournament
+                $.getJSON('/get_rounds', { player: player, opponent: opponent, tournament: tournament }, function (data) {
+                    $('#round').empty().append('<option value="">Select Round</option>');
+                    data.forEach(function (round) {
+                        $('#round').append(`<option value="${round}">${round}</option>`);
+                    });
+                });
+            } else {
+                $('#round').empty().append('<option value="">Select Round</option>');
+            }
+        });
+
+        // Update stats when round changes
+        $('#round').on('change', function () {
+            updateMatchStats();
+        });
+
+        // Update stats function
+        function updateMatchStats() {
+            const player = $('#player').val();
+            const opponent = $('#opponent').val();
+            const tournament = $('#tournament').val();
+            const round = $('#round').val();
+            if (!player || !opponent) {
+                // Reset to default if not enough info
+                $('#avgRallies').text('---');
+                $('#winnerName').text('Player A');
+                $('#winnerWinRate').text('---');
+                $('#loserName').text('Player B');
+                $('#loserWinRate').text('---');
+                return;
+            }
+            $.getJSON('/get_match_stats', {
+                player: player,
+                opponent: opponent,
+                tournament: tournament,
+                round: round
+            }, function(data) {
+                console.log('DEBUG /get_match_stats response:', data); // Debug log
+                $('#avgRallies').text(data.avg_rallies_per_set !== undefined ? data.avg_rallies_per_set : '---');
+                $('#winnerName').text(data.player_a || 'Player A');
+                $('#winnerWinRate').text(data.player_a_win_rate !== undefined ? data.player_a_win_rate + '%' : '---');
+                $('#loserName').text(data.player_b || 'Player B');
+                $('#loserWinRate').text(data.player_b_win_rate !== undefined ? data.player_b_win_rate + '%' : '---');
+            });
+        }
+
+        //This is the function that gets the match for a given player and opponent and tournament and round
+        $('#matchForm').on('submit', function () {
+            const player = $('#player').val();
+            const opponent = $('#opponent').val();
+            $('#match').val(`${player} vs ${opponent}`);
+        });
+    </script>
+</body>
+</html>

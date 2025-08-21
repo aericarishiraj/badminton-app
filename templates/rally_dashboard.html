@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rally Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/minimal.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- CSS -->
+    <style>
+        .tab-content {
+            padding: 20px 0;
+        }
+        .chart-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .chart-container img {
+            max-width: 100%;
+            height: auto;
+        }
+        .kpi-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+        }
+        .kpi-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .progress {
+            height: 25px;
+            margin-bottom: 10px;
+        }
+        .progress-bar {
+            line-height: 25px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .card {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: none;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: bold;
+        }
+        .text-danger {
+            color: #dc3545 !important;
+        }
+        .bg-success {
+            background-color: #28a745 !important;
+        }
+        .bg-info {
+            background-color: #17a2b8 !important;
+        }
+        .bg-warning {
+            background-color: #ffc107 !important;
+            color: #212529 !important;
+        }
+        .bg-danger {
+            background-color: #dc3545 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mt-3">{{ tournament }}</h2>
+                <h3 class="text-muted">{{ player_a }} vs {{ player_b }}</h3>
+                
+                <!-- Navigation Tabs -->
+                <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="rally-tab" data-toggle="tab" href="#rally" role="tab">Rally Analysis</a>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content" id="dashboardTabContent">
+                    <!-- Rally Analysis Tab -->
+                    <div class="tab-pane fade show active" id="rally" role="tabpanel">
+                        
+                        <!-- Rally Decision Support Section (NEW) -->
+                        {% if rally_decision_support %}
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card shadow mb-4 border-0">
+                                    <div class="card-header bg-primary text-white d-flex align-items-center">
+                                        <span class="mr-2"><i class="fas fa-lightbulb"></i></span>
+                                        <h4 class="mb-0">Rally Decision Support</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- 1. Executive Summary -->
+                                        <h5 class="mb-3"><i class="fas fa-clipboard-check text-success"></i> Executive Summary</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <ul class="list-group list-group-flush">
+                                                    <li class="list-group-item"><strong>{{ player_a }} Win %:</strong> {{ rally_decision_support.executive_summary.win_rate_a }}%</li>
+                                                    <li class="list-group-item"><strong>{{ player_a }} Clutch %:</strong> {{ rally_decision_support.executive_summary.clutch_a }}%</li>
+                                                    <li class="list-group-item"><strong>{{ player_a }} PageRank:</strong> {{ rally_decision_support.executive_summary.pagerank_a }}</li>
+                                                    <li class="list-group-item"><strong>{{ player_a }} Streaks:</strong>
+                                                      {% if rally_decision_support.executive_summary.streaks_a %}
+                                                        {% for set, streak in rally_decision_support.executive_summary.streaks_a.items() %}
+                                                          <div>
+                                                            <span class="font-weight-bold">{{ set }}:</span>
+                                                            Win Streak: <span class="badge badge-success">{{ streak['Longest Win Streak'] }}</span>,
+                                                            Loss Streak: <span class="badge badge-danger">{{ streak['Longest Loss Streak'] }}</span>
+                                                          </div>
+                                                        {% endfor %}
+                                                      {% else %}
+                                                        <span class="text-muted">No streak data</span>
+                                                      {% endif %}
+                                                    </li>
+                                                    <li class="list-group-item"><strong>{{ player_a }} Max Error Type:</strong> <span class="badge badge-warning">{{ rally_decision_support.executive_summary.max_error_type_a[0] }}</span> ({{ rally_decision_support.executive_summary.max_error_type_a[1] }}%)</li>
+                                                    <li class="list-group-item"><strong>{{ player_a }} Top 5 Shot Types:</strong>
+                                                      {% for shot, pct in rally_decision_support.executive_summary.max_shot_types_a %}
+                                                        <span class="badge badge-info mb-1">{{ shot }} ({{ pct|round(1) }}%)</span>{% if not loop.last %} {% endif %}
+                                                      {% endfor %}
+                                                    </li>
+                                                    <li class="list-group-item"><strong>{{ player_a }} Error Breakdown:</strong>
+                                                      {% for k, v in rally_decision_support.executive_summary.error_breakdown_a.items() %}
+                                                        <span class="badge badge-secondary mb-1">{{ k }}: {{ v }}%</span>{% if not loop.last %} {% endif %}
+                                                      {% endfor %}
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <ul class="list-group list-group-flush">
+                                                    <li class="list-group-item"><strong>{{ player_b }} Win %:</strong> {{ rally_decision_support.executive_summary.win_rate_b }}%</li>
+                                                    <li class="list-group-item"><strong>{{ player_b }} Clutch %:</strong> {{ rally_decision_support.executive_summary.clutch_b }}%</li>
+                                                    <li class="list-group-item"><strong>{{ player_b }} PageRank:</strong> {{ rally_decision_support.executive_summary.pagerank_b }}</li>
+                                                    <li class="list-group-item"><strong>{{ player_b }} Streaks:</strong>
+                                                      {% if rally_decision_support.executive_summary.streaks_b %}
+                                                        {% for set, streak in rally_decision_support.executive_summary.streaks_b.items() %}
+                                                          <div>
+                                                            <span class="font-weight-bold">{{ set }}:</span>
+                                                            Win Streak: <span class="badge badge-success">{{ streak['Longest Win Streak'] }}</span>,
+                                                            Loss Streak: <span class="badge badge-danger">{{ streak['Longest Loss Streak'] }}</span>
+                                                          </div>
+                                                        {% endfor %}
+                                                      {% else %}
+                                                        <span class="text-muted">No streak data</span>
+                                                      {% endif %}
+                                                    </li>
+                                                    <li class="list-group-item"><strong>{{ player_b }} Max Error Type:</strong> <span class="badge badge-warning">{{ rally_decision_support.executive_summary.max_error_type_b[0] }}</span> ({{ rally_decision_support.executive_summary.max_error_type_b[1] }}%)</li>
+                                                    <li class="list-group-item"><strong>{{ player_b }} Top 5 Shot Types:</strong>
+                                                      {% for shot, pct in rally_decision_support.executive_summary.max_shot_types_b %}
+                                                        <span class="badge badge-info mb-1">{{ shot }} ({{ pct|round(1) }}%)</span>{% if not loop.last %} {% endif %}
+                                                      {% endfor %}
+                                                    </li>
+                                                    <li class="list-group-item"><strong>{{ player_b }} Error Breakdown:</strong>
+                                                      {% for k, v in rally_decision_support.executive_summary.error_breakdown_b.items() %}
+                                                        <span class="badge badge-secondary mb-1">{{ k }}: {{ v }}%</span>{% if not loop.last %} {% endif %}
+                                                      {% endfor %}
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <!-- 2. Tactical Recommendations Table -->
+                                        <h5 class="mt-4 mb-3"><i class="fas fa-chalkboard-teacher text-info"></i> Tactical Recommendations</h5>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover table-bordered bg-white">
+                                                <thead class="thead-light">
+                                                    <tr><th>Player</th><th>KPI</th><th>Recommendation</th></tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for rec in rally_decision_support.tactical_recommendations %}
+                                                    <tr>
+                                                        <td>{{ rec.player }}</td>
+                                                        <td>{{ rec.KPI }}</td>
+                                                        <td>{{ rec.recommendation }}</td>
+                                                    </tr>
+                                            {% endfor %}
+                                                </tbody>
+                                            </table>
+                                    </div>
+                                        <!-- KPI Insights Table (now always visible below recommendations) -->
+                                        <h5 class="mt-4 mb-3"><i class="fas fa-table text-secondary"></i> KPI Insights</h5>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover table-bordered bg-white">
+                                                <thead class="thead-light">
+                                                    <tr>
+                                                        <th>Player</th>
+                                                        <th>Max Shot Type</th>
+                                                        <th>Max Error Type</th>
+                                                        <th>Shot Landing Insight</th>
+                                                        <th>Error Zone Insight</th>
+                                                        <th>Clutch Insight</th>
+                                                        <th>Streak Insight</th>
+                                                        <th>PageRank Insight</th>
+                                                        <th>Recommendation</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for row in rally_decision_support.tactical_recommendations_insights %}
+                                                    <tr>
+                                                        <td>{{ row.player }}</td>
+                                                        <td>{{ row.max_shot_type }}</td>
+                                                        <td>{{ row.max_error_type }}</td>
+                                                        <td>{{ row.shot_landing_insight }}</td>
+                                                        <td>{{ row.error_zone_insight }}</td>
+                                                        <td>{{ row.clutch_insight }}</td>
+                                                        <td>{{ row.streak_insight }}</td>
+                                                        <td>{{ row.pagerank_insight }}</td>
+                                                        <td>{{ row.recommendation }}</td>
+                                                    </tr>
+                                            {% endfor %}
+                                                </tbody>
+                                            </table>
+                                    </div>
+                                        <!-- 3. Expected Utility (Overall) -->
+                                        <h5 class="mt-4 mb-3"><i class="fas fa-balance-scale text-warning"></i> Expected Utility (Overall)</h5>
+                                        <div class="row">
+                            <div class="col-md-6">
+                                                <div class="card mb-3">
+                                                    <div class="card-header bg-light font-weight-bold">{{ player_a }} Expected Utility</div>
+                                                    <div class="card-body p-2">
+                                                        <ul class="list-group list-group-flush">
+                                                            <li class="list-group-item"><strong>Expected Utility:</strong> {{ rally_decision_support.expected_utility[player_a]['Expected Utility'] }}</li>
+                                                            <li class="list-group-item"><strong>Win Probability (P_win):</strong> {{ rally_decision_support.expected_utility[player_a]['P_win'] }}</li>
+                                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                                <div class="card mb-3">
+                                                    <div class="card-header bg-light font-weight-bold">{{ player_b }} Expected Utility</div>
+                                                    <div class="card-body p-2">
+                                                        <ul class="list-group list-group-flush">
+                                                            <li class="list-group-item"><strong>Expected Utility:</strong> {{ rally_decision_support.expected_utility[player_b]['Expected Utility'] }}</li>
+                                                            <li class="list-group-item"><strong>Win Probability (P_win):</strong> {{ rally_decision_support.expected_utility[player_b]['P_win'] }}</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                                        </div>
+                                        <!-- 4. Final Decision Suggestions -->
+                                        <h5 class="mt-4 mb-3"><i class="fas fa-traffic-light text-danger"></i> Final Decision Suggestions</h5>
+                                        <div class="row">
+                                            {% for sugg in rally_decision_support.final_decision_suggestions %}
+                                            <div class="col-md-6 mb-2">
+                                                <div class="alert alert-info mb-0">
+                                                    <strong>{{ sugg.Player }}:</strong> <span style="font-size:1.1em;">{{ sugg.Label }}</span><br>
+                                                    <span>{{ sugg.Reason }}</span>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a href="/" class="btn btn-primary">← Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html> 

@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>KPI Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/minimal.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mt-3">{{ tournament }}</h2>
+                <h3 class="text-muted">{{ player_a }} vs {{ player_b }}</h3>
+                
+                <!-- Navigation Tabs -->
+                <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="kpi-tab" data-toggle="tab" href="#kpi" role="tab">KPI Analysis</a>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content" id="dashboardTabContent">
+                    <!-- KPI Tab -->
+                    <div class="tab-pane fade show active" id="kpi" role="tabpanel">
+                        <div class="row mt-3">
+                            <!-- KPI Cards -->
+                            <div class="col-md-3">
+                                <div class="kpi-card">
+                                    <h5>Player A Rallies</h5>
+                                    <div class="kpi-value">{{ kpi_data.mean_winner_points }}</div>
+                                    <small class="text-muted">Rallies won by {{ player_a }}</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="kpi-card">
+                                    <h5>Player B Rallies</h5>
+                                    <div class="kpi-value">{{ kpi_data.mean_loser_points }}</div>
+                                    <small class="text-muted">Rallies won by {{ player_b }}</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="kpi-card">
+                                    <h5>Total Rallies</h5>
+                                    <div class="kpi-value">{{ kpi_data.rally_analysis.total_rallies if kpi_data.rally_analysis else 0 }}</div>
+                                    <small class="text-muted">Total rallies analyzed</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="kpi-card">
+                                    <h5>Draw Probability</h5>
+                                    <div class="kpi-value">{{ kpi_data.draw_probability }}</div>
+                                    <small class="text-muted">Probability of equal performance</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Rally Statistics -->
+                        {% if kpi_data.rally_analysis %}
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6>Win Rates</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <h6>{{ player_a }}</h6>
+                                                <div class="progress mb-2">
+                                                    <div class="progress-bar" role="progressbar" 
+                                                         style="width: {{ kpi_data.rally_analysis.player_a_win_rate }}%">
+                                                        {{ kpi_data.rally_analysis.player_a_win_rate }}%
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <h6>{{ player_b }}</h6>
+                                                <div class="progress mb-2">
+                                                    <div class="progress-bar bg-success" role="progressbar" 
+                                                         style="width: {{ kpi_data.rally_analysis.player_b_win_rate }}%">
+                                                        {{ kpi_data.rally_analysis.player_b_win_rate }}%
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6>Match Statistics</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Average Rallies per Set:</strong> {{ kpi_data.rally_analysis.avg_rallies_per_set }}</p>
+                                        <p><strong>Player A Win Rate:</strong> {{ kpi_data.rally_analysis.player_a_win_rate }}%</p>
+                                        <p><strong>Player B Win Rate:</strong> {{ kpi_data.rally_analysis.player_b_win_rate }}%</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Charts -->
+                        {% if kpi_data.histogram_chart %}
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h5>Score Distribution at Rally-End (per Player)</h5>
+                                <div class="alert alert-info mb-3">
+                                    <strong>What This Tells Us</strong><br>
+                                    This chart illustrates where rallies typically end in terms of player scores.<br>
+                                    • If a player's bars are concentrated in the lower score range (e.g., 0–8), it suggests they are frequently losing rallies early and may be struggling to accumulate points.<br>
+                                    • If the bars are higher around the mid or upper score ranges (e.g., 10–21), it indicates the player is more likely to sustain rallies, potentially winning more points or reaching the closing stages of a set.<br>
+                                    • By comparing the distribution for both players, stakeholders can identify momentum shifts, point streak patterns, and who tends to close rallies at critical moments.
+                                </div>
+                                <div class="chart-container">
+                                    <img src="data:image/png;base64,{{ kpi_data.histogram_chart }}" alt="Rally Score Histogram">
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if kpi_data.distribution_chart %}
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h5>Rally Analysis & Player Performance</h5>
+                                <div class="alert alert-info mb-3">
+                                    <strong>This dashboard combines two perspectives to evaluate player performance in rallies:</strong><br><br>
+                                    <strong>Score Distribution (Left Chart)</strong><br>
+                                    • The green bars represent the actual distribution of scores at rally-end across the match.<br>
+                                    • The blue curve shows a Poisson distribution with a mean (μ) equal to the average score, used as a statistical benchmark.<br>
+                                    • This helps assess whether scoring patterns are typical/random or show unexpected trends (e.g., more frequent high/low scores than predicted).<br><br>
+                                    <strong>Rallies Won by Player (Right Chart)</strong><br>
+                                    • This bar chart directly compares the number of rallies each player won.<br>
+                                    • A higher bar suggests stronger rally control or better execution under pressure.<br>
+                                    • It allows quick visual benchmarking of performance between opponents.<br><br>
+                                    <strong>Together, these visuals offer insight into a player's scoring consistency, tactical efficiency, and ability to convert rallies into points compared to expected statistical norms.</strong>
+                                </div>
+                                <div class="chart-container">
+                                    <img src="data:image/png;base64,{{ kpi_data.distribution_chart }}" alt="Rally Distribution Analysis">
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- New Advanced KPIs Section -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h4>Advanced Performance KPIs</h4>
+                            </div>
+                        </div>
+
+                        <!-- Win Rate by Rally Length -->
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6>{{ player_a }} - Win Rate by Rally Length</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-info mb-2">
+                                            <strong>Win Rate by Rally Length:</strong> Breakdown of win probability based on rally duration. This analysis shows how each player performs in rallies of different lengths, helping identify whether players are more effective in short, medium, or long rallies.
+                                        </div>
+                                        {% if winrate_a %}
+                                            {% for length, rate in winrate_a.items() %}
+                                            <div class="row mb-2">
+                                                <div class="col-6">{{ length }} shots</div>
+                                                <div class="col-6">
+                                                    <div class="progress">
+                                                        <div class="progress-bar" role="progressbar" style="width: {{ rate }}%">
+                                                            {{ rate }}%
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="text-muted">No data available</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6>{{ player_b }} - Win Rate by Rally Length</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-info mb-2">
+                                            <strong>Win Rate by Rally Length:</strong> Breakdown of win probability based on rally duration. This analysis shows how each player performs in rallies of different lengths, helping identify whether players are more effective in short, medium, or long rallies.
+                                        </div>
+                                        {% if winrate_b %}
+                                            {% for length, rate in winrate_b.items() %}
+                                            <div class="row mb-2">
+                                                <div class="col-6">{{ length }} shots</div>
+                                                <div class="col-6">
+                                                    <div class="progress">
+                                                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ rate }}%">
+                                                            {{ rate }}%
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="text-muted">No data available</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Serve & Receive Performance -->
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6>{{ player_a }} - Serve & Receive Performance</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-info mb-2">
+                                            <strong>Serve & Receive Performance:</strong> This section evaluates a player's ability to win points from serve and receive situations.
+                                        </div>
+                                        {% if serve_receive_a %}
+                                            <div class="row mb-2">
+                                                <div class="col-6">Serve Win %</div>
+                                                <div class="col-6">
+                                                    <div class="progress">
+                                                        <div class="progress-bar" role="progressbar" style="width: {{ serve_receive_a['Serve Win %'] }}%">
+                                                            {{ serve_receive_a['Serve Win %'] }}%
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-2">
+                                                <div class="col-6">Receive Win %</div>
+                                                <div class="col-6">
+                                                    <div class="progress">
+                                                        <div class="progress-bar bg-info" role="progressbar" style="width: {{ serve_receive_a['Receive Win %'] }}%">
+                                                            {{ serve_receive_a['Receive Win %'] }}%
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <p class="text-muted">No data available</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6>{{ player_b }} - Serve & Receive Performance</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-info mb-2">
+                                            <strong>Serve & Receive Performance:</strong> This section evaluates a player's ability to win points from serve and receive situations.
+                                        </div>
+                                        {% if serve_receive_b %}
+                                            <div class="row mb-2">
+                                                <div class="col-6">Serve Win %</div>
+                                                <div class="col-6">
+                                                    <div class="progress">
+                                                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ serve_receive_b['Serve Win %'] }}%">
+                                                            {{ serve_receive_b['Serve Win %'] }}%
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-2">
+                                                <div class="col-6">Receive Win %</div>
+                                                <div class="col-6">
+                                                    <div class="progress">
+                                                        <div class="progress-bar bg-warning" role="progressbar" style="width: {{ serve_receive_b['Receive Win %'] }}%">
+                                                            {{ serve_receive_b['Receive Win %'] }}%
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <p class="text-muted">No data available</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Shot Effectiveness -->
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6>{{ player_a }} - Shot Effectiveness</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-info mb-2">
+                                            <strong>Shot Effectiveness:</strong> This section evaluates a player's ability to win points from different types of shots.
+                                        </div>
+                                        {% if shot_effectiveness_a %}
+                                            {% for shot_type, effectiveness in shot_effectiveness_a.items() %}
+                                            <div class="row mb-2">
+                                                <div class="col-6">{{ shot_type }}</div>
+                                                <div class="col-6">
+                                                    <div class="progress">
+                                                        <div class="progress-bar" role="progressbar" style="width: {{ effectiveness }}%">
+                                                            {{ effectiveness }}%
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="text-muted">No data available</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6>{{ player_b }} - Shot Effectiveness</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-info mb-2">
+                                            <strong>Shot Effectiveness:</strong> This section evaluates a player's ability to win points from different types of shots.
+                                        </div>
+                                        {% if shot_effectiveness_b %}
+                                            {% for shot_type, effectiveness in shot_effectiveness_b.items() %}
+                                            <div class="row mb-2">
+                                                <div class="col-6">{{ shot_type }}</div>
+                                                <div class="col-6">
+                                                    <div class="progress">
+                                                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ effectiveness }}%">
+                                                            {{ effectiveness }}%
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="text-muted">No data available</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Shot Selection Frequency -->
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6>{{ player_a }} - Shot Selection Frequency</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-info mb-2">
+                                            <strong>Shot Selection Frequency:</strong> This section evaluates a player's tendency to choose different types of shots.
+                                        </div>
+                                        {% if shot_freq_a %}
+                                            {% for shot_type, frequency in shot_freq_a.items() %}
+                                            <div class="row mb-2">
+                                                <div class="col-6">{{ shot_type }}</div>
+                                                <div class="col-6">
+                                                    <div class="progress">
+                                                        <div class="progress-bar" role="progressbar" style="width: {{ frequency }}%">
+                                                            {{ frequency }}%
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="text-muted">No data available</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6>{{ player_b }} - Shot Selection Frequency</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-info mb-2">
+                                            <strong>Shot Selection Frequency:</strong> This section evaluates a player's tendency to choose different types of shots.
+                                        </div>
+                                        {% if shot_freq_b %}
+                                            {% for shot_type, frequency in shot_freq_b.items() %}
+                                            <div class="row mb-2">
+                                                <div class="col-6">{{ shot_type }}</div>
+                                                <div class="col-6">
+                                                    <div class="progress">
+                                                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ frequency }}%">
+                                                            {{ frequency }}%
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="text-muted">No data available</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Error Breakdown -->
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6>{{ player_a }} - Error Type Breakdown</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-info mb-2">
+                                            <strong>Error Type Breakdown:</strong> This section evaluates a player's frequency of making errors in different types of situations.
+                                        </div>
+                                        {% if error_breakdown_a %}
+                                            {% for error_type, percentage in error_breakdown_a.items() %}
+                                            <div class="row mb-2">
+                                                <div class="col-6">{{ error_type }}</div>
+                                                <div class="col-6">
+                                                    <div class="progress">
+                                                        <div class="progress-bar bg-danger" role="progressbar" style="width: {{ percentage }}%">
+                                                            {{ percentage }}%
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="text-muted">No data available</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6>{{ player_b }} - Error Type Breakdown</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-info mb-2">
+                                            <strong>Error Type Breakdown:</strong> This section evaluates a player's frequency of making errors in different types of situations.
+                                        </div>
+                                        {% if error_breakdown_b %}
+                                            {% for error_type, percentage in error_breakdown_b.items() %}
+                                            <div class="row mb-2">
+                                                <div class="col-6">{{ error_type }}</div>
+                                                <div class="col-6">
+                                                    <div class="progress">
+                                                        <div class="progress-bar bg-danger" role="progressbar" style="width: {{ percentage }}%">
+                                                            {{ percentage }}%
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="text-muted">No data available</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Streaks by Set -->
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6>{{ player_a }} - Streaks by Set</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-info mb-2">
+                                            <strong>Streaks by Set:</strong> This section evaluates a player's ability to maintain winning or losing streaks in different sets.
+                                        </div>
+                                        {% if streaks_a %}
+                                            {% for set_name, streaks in streaks_a.items() %}
+                                            <div class="mb-3">
+                                                <h6>{{ set_name }}</h6>
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <small class="text-muted">Longest Win Streak</small>
+                                                        <div class="kpi-value">{{ streaks['Longest Win Streak'] }}</div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <small class="text-muted">Longest Loss Streak</small>
+                                                        <div class="kpi-value text-danger">{{ streaks['Longest Loss Streak'] }}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="text-muted">No data available</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6>{{ player_b }} - Streaks by Set</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-info mb-2">
+                                            <strong>Streaks by Set:</strong> This section evaluates a player's ability to maintain winning or losing streaks in different sets.
+                                        </div>
+                                        {% if streaks_b %}
+                                            {% for set_name, streaks in streaks_b.items() %}
+                                            <div class="mb-3">
+                                                <h6>{{ set_name }}</h6>
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <small class="text-muted">Longest Win Streak</small>
+                                                        <div class="kpi-value">{{ streaks['Longest Win Streak'] }}</div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <small class="text-muted">Longest Loss Streak</small>
+                                                        <div class="kpi-value text-danger">{{ streaks['Longest Loss Streak'] }}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="text-muted">No data available</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Clutch Performance & Mean Winning Shots -->
+                        <div class="row mt-3">
+                            <div class="col-md-3">
+                                <div class="kpi-card">
+                                    <h5>{{ player_a }} Clutch Performance</h5>
+                                    <div class="kpi-value">{{ clutch_win_a }}%</div>
+                                    <small class="text-muted">Win rate in clutch situations (18-20+ points)</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="kpi-card">
+                                    <h5>{{ player_b }} Clutch Performance</h5>
+                                    <div class="kpi-value">{{ clutch_win_b }}%</div>
+                                    <small class="text-muted">Win rate in clutch situations (18-20+ points)</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="kpi-card">
+                                    <h5>{{ player_a }} Mean Winning Shots</h5>
+                                    <div class="kpi-value">{{ mean_winning_shots_a }}</div>
+                                    <small class="text-muted">Average shots per winning rally</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="kpi-card">
+                                    <h5>{{ player_b }} Mean Winning Shots</h5>
+                                    <div class="kpi-value">{{ mean_winning_shots_b }}</div>
+                                    <small class="text-muted">Average shots per winning rally</small>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a href="/" class="btn btn-primary">← Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

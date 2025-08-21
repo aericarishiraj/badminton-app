@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Badminton Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- CSS -->
+    <style>
+        .tab-content {
+            padding: 20px 0;
+        }
+        .chart-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .chart-container img {
+            max-width: 100%;
+            height: auto;
+        }
+        .kpi-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+        }
+        .kpi-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        /* Advanced KPI Styling */
+        .advanced-kpi-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .kpi-section-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e9ecef;
+        }
+        .kpi-section-header {
+            background: #f8f9fa;
+            color: #495057;
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 16px;
+            border-left: 4px solid #667eea;
+        }
+        .metric-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #e9ecef;
+            transition: all 0.2s ease;
+        }
+        .metric-card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+        .metric-label {
+            color: #6c757d;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .player-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #e9ecef;
+        }
+        .player-name {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 16px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+        .kpi-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .kpi-list li {
+            background: white;
+            border-radius: 6px;
+            padding: 10px 15px;
+            margin: 8px 0;
+            font-size: 14px;
+            border: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .kpi-value {
+            font-weight: 600;
+            color: #495057;
+        }
+        .progress-indicator {
+            width: 60px;
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-left: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        .score-progression-table {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e9ecef;
+        }
+        .score-progression-table .table {
+            margin: 0;
+        }
+        .score-progression-table th {
+            background: #f8f9fa;
+            color: #495057;
+            border: 1px solid #e9ecef;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .score-progression-table td {
+            border: 1px solid #e9ecef;
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+        .clutch-performance-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            color: #495057;
+            border: 1px solid #e9ecef;
+        }
+        .clutch-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+        .streak-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #e9ecef;
+        }
+        .streak-item {
+            background: white;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 8px 0;
+            font-size: 14px;
+            border: 1px solid #e9ecef;
+        }
+        .win-streak {
+            color: #28a745;
+            font-weight: 600;
+        }
+        .loss-streak {
+            color: #dc3545;
+            font-weight: 600;
+        }
+        .percentage-badge {
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        .value-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .score-progression-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .score-progression-table .table {
+            margin: 0;
+        }
+        .score-progression-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+        .score-progression-table td {
+            border: 1px solid #e9ecef;
+            padding: 8px 12px;
+        }
+        .clutch-performance-card {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            color: #333;
+        }
+        .clutch-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 5px;
+        }
+        .streak-card {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .streak-item {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        .win-streak {
+            color: #27ae60;
+            font-weight: 600;
+        }
+        .loss-streak {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mt-3">{{ tournament }}</h2>
+                <h3 class="text-muted">{{ player_a }} vs {{ player_b }}</h3>
+                
+                <!-- Navigation Tabs -->
+                <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="kpi-tab" data-toggle="tab" href="#kpi" role="tab">Spatial Analysis</a>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content" id="dashboardTabContent">
+                    <!-- KPI Tab -->
+                    <div class="tab-pane fade show active" id="kpi" role="tabpanel">
+                        
+                        <!-- Shot Landing Heatmap -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Shot Landing Heatmap</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row mb-3">
+                                            <div class="col-md-3">
+                                                <label for="shotHeatmapSetSelect">Set:</label>
+                                                <select id="shotHeatmapSetSelect" class="form-control">
+                                                    <option value="">All Sets</option>
+                                                    <option value="1">Set 1</option>
+                                                    <option value="2">Set 2</option>
+                                                    <option value="3">Set 3</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <!-- Graph Column -->
+                                            <div class="col-md-8">
+                                                <div id="heatmap"></div>
+                                            </div>
+                                            
+                                            <!-- Description Column -->
+                                            <div class="col-md-4">
+                                                <div id="shotHeatmapDescription" class="alert alert-info">
+                                                    <strong>What the Shot Landing Heatmap Tells Us:</strong><br>
+                                                    This chart maps the landing positions of shots where the player won the rally or where the opponent committed an error, revealing the most effective target zones.<br><br>
+                                                    <strong>Legend:</strong><br>
+                                                    🟢 Winner (green): Shuttle landed and won the point<br>
+                                                    🔵 Opponent out (blue): Opponent hit it out<br>
+                                                    🔴 Opponent net (pink): Opponent hit into net<br>
+                                                    🟠 Opponent did not cross net (orange): Opponent couldn't return
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rally-End Zone Analysis -->
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Rally-End Zone Analysis</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row mb-3">
+                                            <div class="col-md-3">
+                                                <label for="rallyEndZoneRoundSelect">Set/Round:</label>
+                                                <select id="rallyEndZoneRoundSelect" class="form-control">
+                                                    <option value="">All Sets</option>
+                                                    <option value="1">Set 1</option>
+                                                    <option value="2">Set 2</option>
+                                                    <option value="3">Set 3</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <!-- Graph Column -->
+                                            <div class="col-md-8">
+                                                <div id="rallyEndZonePlot"></div>
+                                            </div>
+                                            
+                                            <!-- Description Column -->
+                                            <div class="col-md-4">
+                                                <div id="rallyEndZoneDescription" class="alert alert-info">
+                                                    <strong>What it tells us:</strong><br>
+                                                    This visual displays the locations where rallies ended during the selected set. Each dot on the court represents a final shot landing position, with its color indicating the length of the rally.<br><br>
+                                                    <strong>Color Scale:</strong><br>
+                                                    🟥 Darker Red = Short rallies (1-5 shots)<br>
+                                                    🟨 Lighter Yellow = Longer rallies (20+ shots)<br><br>
+                                                    When hovered, each point shows rally length, win reason, and set number.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Serve & Return Placement Explorer -->
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Serve Placement Explorer</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="serveReturnForm" class="form-inline mb-3">
+                                            <label class="mr-2">Player:</label>
+                                            <select id="servePlayer" class="form-control mr-3"></select>
+                                            <label class="mr-2">Serve Type:</label>
+                                            <select id="serveType" class="form-control"></select>
+                                        </form>
+                                        
+                                        <div class="row">
+                                            <!-- Graph Column -->
+                                            <div class="col-md-8">
+                                                <div id="serveReturnPlot"></div>
+                                            </div>
+                                            
+                                            <!-- Description Column -->
+                                            <div class="col-md-4">
+                                                <div id="serveReturnDescription" class="alert alert-info">
+                                                    <strong>What it tells us:</strong><br>
+                                                    This visual shows the landing positions of serves or returns for the selected player and serve type. Each blue dot represents where the shuttle landed after the serve or return during gameplay.<br><br>
+                                                    <strong>What it shows:</strong><br>
+                                                    - Serve accuracy and depth – Placement close to baseline vs midcourt<br>
+                                                    - Tactical preferences – Serving to backhand, forehand, or center zones<br>
+                                                    - Consistency – Cluster tightness reflects control and reliability
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Error Zone Map -->
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Error Zone Map</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row mb-3">
+                                            <div class="col-md-4">
+                                                <label for="errorPlayer">Player:</label>
+                                                <select id="errorPlayer" class="form-control">
+                                                    <option value="">All Players</option>
+                                                    <option value="{{ player_a }}" selected>{{ player_a }}</option>
+                                                    <option value="{{ player_b }}">{{ player_b }}</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="errorTypeSelect">Error Type:</label>
+                                                <select id="errorTypeSelect" class="form-control">
+                                                    <option value="">All Errors</option>
+                                                    <!-- Dynamically populated -->
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="errorZoneRoundSelect">Set/Round:</label>
+                                                <select id="errorZoneRoundSelect" class="form-control">
+                                                    <option value="">All Sets</option>
+                                                    <option value="1">Set 1</option>
+                                                    <option value="2">Set 2</option>
+                                                    <option value="3">Set 3</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <!-- Graph Column -->
+                                            <div class="col-md-8">
+                                                <div id="errorZonePlot"></div>
+                                            </div>
+                                            
+                                            <!-- Description Column -->
+                                            <div class="col-md-4">
+                                                <div id="errorZoneDescription" class="alert alert-info">
+                                                    <strong>What it tells us:</strong><br>
+                                                    This chart visualizes unforced error locations on the court for selected players, categorized by error type.<br><br>
+                                                    <strong>Error Categories:</strong><br>
+                                                    ❌ Net errors (red cross)<br>
+                                                    🔷 Did not cross net (blue diamond)<br>
+                                                    🟢 Out (light teal circles)<br><br>
+                                                    Each marker's position corresponds to where the shot landed or failed, allowing stakeholders to detect error concentration zones and identify court regions requiring tactical/technical improvement.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Movement Density Heatmap -->
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Movement Density Heatmap</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="movementDensityForm" class="form-inline mb-3">
+                                            <label class="mr-2">Player:</label>
+                                            <select id="movementPlayer" class="form-control mr-3">
+                                                <option value="{{ player_a }}">{{ player_a }}</option>
+                                                <option value="{{ player_b }}">{{ player_b }}</option>
+                                            </select>
+                                            <label class="mr-2">Set:</label>
+                                            <select id="movementRoundSelect" class="form-control mr-3">
+                                                <option value="">All</option>
+                                                <option value="1">Set 1</option>
+                                                <option value="2">Set 2</option>
+                                                <option value="3">Set 3</option>
+                                            </select>
+                                        </form>
+                                        
+                                        <div class="row">
+                                            <!-- Graph Column -->
+                                            <div class="col-md-8">
+                                                <div id="movementDensityPlot"></div>
+                                            </div>
+                                            
+                                            <!-- Description Column -->
+                                            <div class="col-md-4">
+                                                <div id="movementDensityDescription" class="alert alert-info">
+                                                    <strong>What it tells us:</strong><br>
+                                                    This heatmap visualizes where players spend the most time while hitting the shuttle across all selected sets. The court is divided into a grid, with warmer colors indicating higher activity.<br><br>
+                                                    <strong>Color Interpretation:</strong><br>
+                                                    🔴 Red Zones: Low movement frequency<br>
+                                                    🟠 Orange Zones: Moderate activity<br>
+                                                    🟡 Yellow Zones: High-density zones — areas where the player hits most often
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                       <!-- Shot Type Spatial Signature -->
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Shot Type Spatial Signature</h3>
+        
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row mb-3">
+                                            <div class="col-md-3">
+                                                <label for="spatialSignaturePlayer">Player:</label>
+                                                <select id="spatialSignaturePlayer" class="form-control">
+                                                    <option value="">All Players</option>
+                                                    <option value="{{ player_a }}">{{ player_a }}</option>
+                                                    <option value="{{ player_b }}">{{ player_b }}</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label for="spatialSignatureShotType">Shot Type:</label>
+                                                <select id="spatialSignatureShotType" class="form-control">
+                                                    <option value="">All Shot Types</option>
+                                                    <!-- Options will be populated dynamically -->
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label for="spatialSignatureRoundSelect">Set/Round:</label>
+                                                <select id="spatialSignatureRoundSelect" class="form-control">
+                                                    <option value="">All Sets</option>
+                                                    <option value="1">Set 1</option>
+                                                    <option value="2">Set 2</option>
+                                                    <option value="3">Set 3</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <!-- Graph Column -->
+                                            <div class="col-md-8">
+                                                <div id="spatialSignaturePlot"></div>
+                                            </div>
+                                            
+                                            <!-- Description Column -->
+                                            <div class="col-md-4">
+                                                <div id="spatialSignatureDescription" class="alert alert-info">
+                                                    <strong>What it tells us:</strong><br>
+                                                    This court map illustrates the spatial pattern of all shots played during the match. It tracks the complete path of each shot from its origin to its landing location.<br><br>
+                                                    <strong>Legend:</strong><br>
+                                                    🔴 Red: Shot origin (where the player hit the shuttle)<br>
+                                                    🔵 Blue: Shot landing (where the shuttle touched down)<br><br>
+                                                    Lines connect the origin and landing points to clearly show shot direction, depth, and court coverage.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a href="/" class="btn btn-primary">← Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <script>
+    function createHeatmap(data) {
+        // Update the description based on current selections
+        updateShotHeatmapDescription();
+        
+        // Check if we have valid data
+        if (!data || !data.landing_x || !data.landing_y || !data.win_reason || 
+            data.landing_x.length === 0 || data.landing_y.length === 0) {
+            document.getElementById('heatmap').innerHTML = '<div class="alert alert-info">No shot data available for the selected filters. Please select different criteria and try again.</div>';
+            return;
+        }
+
+        // Use the same court config as shot type spatial signature
+        const court = {
+          doublesWidth: 6.10,
+          singlesWidth: 5.18,
+          length:        13.40,
+          serviceDist:   1.98,
+          margin:        (6.10 - 5.18) / 2
+        };
+
+        // Create the court layout (rotated)
+        const courtLayout = {
+            shapes: [
+                // outer (doubles) court - ROTATED: width is Y, length is X
+                { type:'rect', x0:0, x1:court.length, y0:0, y1:court.doublesWidth, line:{color:'white',width:2} },
+                // inner singles court - ROTATED
+                { type:'rect',
+                  x0:0,            x1:court.length,
+                  y0:court.margin, y1:court.doublesWidth-court.margin,
+                  line:{color:'white',width:2, dash:'dash'}
+                },
+                // net - ROTATED: now vertical at X=6.7
+                { type:'line',
+                  x0:court.length/2, x1:court.length/2,
+                  y0:0, y1:court.doublesWidth,
+                  line:{color:'white',width:3}
+                },
+                // center-line - ROTATED: now horizontal at Y=center
+                { type:'line',
+                  x0:0, x1:court.length,
+                  y0:court.doublesWidth/2, y1:court.doublesWidth/2,
+                  line:{color:'white',width:1}
+                },
+                // short service lines - ROTATED
+                { type:'line',
+                  x0:court.serviceDist, y0:court.margin,
+                  x1:court.serviceDist, y1:court.doublesWidth-court.margin,
+                  line:{color:'white',width:1}
+                },
+                { type:'line',
+                  x0:court.length-court.serviceDist,
+                  y0:court.margin,
+                  x1:court.length-court.serviceDist,
+                  y1:court.doublesWidth-court.margin,
+                  line:{color:'white',width:1}
+                }
+            ],
+            annotations: [
+                // Player B (Loser) - Left side of court (outside)
+                {
+                    x: court.length * 0.25,
+                    y: court.doublesWidth + 0.8,
+                    text: "{{ player_b }}",
+                    showarrow: false,
+                    font: { color: 'white', size: 14, family: 'Arial' },
+                    bgcolor: 'rgba(0,0,0,0.7)',
+                    bordercolor: 'white',
+                    borderwidth: 1
+                },
+                // Player A (Winner) - Right side of court (outside)
+                {
+                    x: court.length * 0.75,
+                    y: court.doublesWidth + 0.8,
+                    text: "{{ player_a }}",
+                    showarrow: false,
+                    font: { color: 'white', size: 14, family: 'Arial' },
+                    bgcolor: 'rgba(0,0,0,0.7)',
+                    bordercolor: 'white',
+                    borderwidth: 1
+                },
+            ],
+            xaxis: {
+                range: [0, court.length],
+                showgrid: false,
+                zeroline: false,
+                showticklabels: false,
+                scaleanchor: 'y', scaleratio: 1, fixedrange: true
+            },
+            yaxis: {
+                range: [0, court.doublesWidth + 1.2], // Extended to accommodate labels
+                showgrid: false,
+                zeroline: false,
+                showticklabels: false,
+                fixedrange: true
+            },
+            plot_bgcolor: '#2c3338',
+            paper_bgcolor: '#2c3338',
+            margin: {t: 50, r: 30, b: 100, l: 30},
+            showlegend: true,
+            title: {
+                text: 'Shot Landing Positions',
+                font: { color: 'white', size: 20 }
+            },
+            legend: {
+                font: { color: 'white' },
+                bgcolor: 'rgba(0,0,0,0.5)',
+                x: 0.5,
+                y: -0.15,
+                xanchor: 'center',
+                yanchor: 'top',
+                orientation: 'h'
+            },
+            width: 1100,
+            height: 500
+        };
+
+        // Define color scheme for different shot types
+        const shotTypeColors = {
+            // Winners
+            'Smash Winner': '#ff0000',        // Red for smashes
+            'Lift Winner': '#ff6600',         // Orange for lifts
+            'Service Winner': '#ffff00',      // Yellow for service winners
+            'Winner (shuttle landed)': '#00ff00', // Green for general winners
+            
+            // Errors
+            'Net': '#ff00ff',                 // Magenta for net errors
+            'Out': '#00ffff',                 // Cyan for out errors
+            'Did not cross net': '#ff8800',   // Dark orange for not crossing net
+            'Opponent Error': '#ff0088',      // Pink for opponent errors
+            'Return Error': '#8800ff',        // Purple for return errors
+            'Opponent did not cross net': '#ffaa00', // Light orange
+            'Opponent out': '#00aaff',        // Light blue
+            'Opponent net': '#ff00aa',        // Light pink
+            
+            // Default colors for any other types
+            'Unknown': '#888888',             // Gray for unknown
+            'Other': '#cccccc'                // Light gray for other
+        };
+
+        // Create separate traces for different shot types
+        const shotTypes = [...new Set(data.win_reason)];
+        const traces = shotTypes.map(type => {
+            const indices = data.win_reason.map((r, i) => r === type ? i : -1).filter(i => i !== -1);
+            
+            // Determine color based on shot type
+            let color = '#888888'; // Default gray
+            for (const [pattern, patternColor] of Object.entries(shotTypeColors)) {
+                if (type.includes(pattern)) {
+                    color = patternColor;
+                    break;
+                }
+            }
+            
+            return {
+                x: indices.map(i => data.landing_x[i]),
+                y: indices.map(i => data.landing_y[i]),
+                mode: 'markers',
+                type: 'scatter',
+                name: type,
+                marker: {
+                    size: 12,
+                    opacity: 0.8,
+                    color: color,
+                    line: {
+                        color: 'white',
+                        width: 1
+                    },
+                    symbol: 'circle'
+                },
+                hovertemplate: type + '<br>X: %{x:.1f}m<br>Y: %{y:.1f}m<extra></extra>'
+            };
+        });
+
+        Plotly.newPlot('heatmap', traces, courtLayout, {
+            displayModeBar: false,
+            responsive: true
+        });
+    }
+
+    // Initialize heatmap when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        // Heatmap
+        const heatmapData = {% if heatmap_data %}{{ heatmap_data | tojson | safe }}{% else %}null{% endif %};
+        if (heatmapData) {
+            console.log('Heatmap data:', heatmapData);  // Debug log
+            createHeatmap(heatmapData);
+        }
+
+        // Serve & Return Placement Explorer
+        populateServeReturnDropdowns();
+        populateServeTypes();
+        fetchServeReturnPlacement();
+        updateServeReturnDescription(); // Set initial description
+        document.getElementById('servePlayer').addEventListener('change', function() {
+            populateServeTypes();
+            fetchServeReturnPlacement();
+            updateServeReturnDescription();
+        });
+        document.getElementById('serveType').addEventListener('change', function() {
+            fetchServeReturnPlacement();
+            updateServeReturnDescription();
+        });
+        
+        // Error Zone Map - fetch data immediately since default is set in HTML
+        fetchErrorTypes();
+        fetchErrorZoneData();
+        updateErrorZoneDescription(); // Set initial description
+
+        // Movement Density Heatmap
+        fetchMovementDensityHeatmap();
+        updateMovementDensityDescription(); // Set initial description
+
+        // Shot Type Spatial Signature
+        fetchAvailableShotTypes();
+        fetchShotTypeSpatialSignature();
+        updateSpatialSignatureDescription(); // Set initial description
+        document.getElementById('spatialSignaturePlayer').addEventListener('change', function() {
+            fetchAvailableShotTypes();
+            fetchShotTypeSpatialSignature();
+        });
+        document.getElementById('spatialSignatureShotType').addEventListener('change', fetchShotTypeSpatialSignature);
+        document.getElementById('spatialSignatureRoundSelect').addEventListener('change', function() {
+            fetchAvailableShotTypes();
+            fetchShotTypeSpatialSignature();
+        });
+
+        // Rally-End Zone Analysis
+        fetchRallyEndZoneData();
+        updateRallyEndZoneDescription(); // Set initial description
+        document.getElementById('rallyEndZoneRoundSelect').addEventListener('change', function() {
+            fetchRallyEndZoneData();
+            updateRallyEndZoneDescription();
+        });
+
+        // Heatmap
+        fetchShotLandingHeatmap();
+        updateShotHeatmapDescription(); // Set initial description
+        document.getElementById('shotHeatmapSetSelect').addEventListener('change', function() {
+            fetchShotLandingHeatmap();
+            updateShotHeatmapDescription();
+        });
+    });
+
+    // Serve & Return Placement Explorer logic
+    function plotServeReturnPlacement(data) {
+        // Update the description based on current selections
+        updateServeReturnDescription();
+        
+        if (!data || !data.landing_x || !data.landing_y || data.landing_x.length === 0) {
+            document.getElementById('serveReturnPlot').innerHTML = '<div class="alert alert-info">No serve/return data available for the selected filters.<br><small>Tip: Try selecting "All" for Player or Serve Type.</small></div>';
+            return;
+        }
+        // Use the same court layout as shot type spatial signature (rotated) but with custom title
+        const trace = {
+            x: data.landing_x,
+            y: data.landing_y,
+            mode: 'markers',
+            type: 'scatter',
+            marker: {
+                size: 12,
+                color: '#007bff',
+                opacity: 0.7,
+                line: { color: 'white', width: 1 }
+            },
+            text: data.type,
+            hovertemplate: 'Type: %{text}<br>X: %{x:.1f}m<br>Y: %{y:.1f}m<extra></extra>'
+        };
+        
+        // Create layout based on getCourtLayout but with custom title
+        const layout = getCourtLayout();
+        layout.title.text = 'Serve Landing Positions';
+        
+        Plotly.newPlot('serveReturnPlot', [trace], layout, {displayModeBar: false, responsive: true});
+    }
+    // Populate player and serve type dropdowns
+    function populateServeReturnDropdowns() {
+        // Use only winner and loser for this match
+        const players = ['{{ player_a }}', '{{ player_b }}'];
+        const playerSelect = document.getElementById('servePlayer');
+        const serveTypeSelect = document.getElementById('serveType');
+        playerSelect.innerHTML = '<option value="">All</option>' + players.map(p => `<option value="${p}">${p}</option>`).join('');
+        // Serve types will be populated dynamically
+        serveTypeSelect.innerHTML = '<option value="">Loading...</option>';
+    }
+    
+    // Populate serve types based on current selection
+    function populateServeTypes() {
+        const player = document.getElementById('servePlayer').value;
+        const winner = "{{ player_a }}";
+        const loser = "{{ player_b }}";
+        
+        $.get('/get_available_serve_types', {player, winner, loser}, function(serveTypes) {
+            const serveTypeSelect = document.getElementById('serveType');
+            serveTypeSelect.innerHTML = '<option value="">All</option>' + serveTypes.map(t => `<option value="${t}">${t}</option>`).join('');
+        });
+    }
+    // Fetch and plot serve/return placement
+    function fetchServeReturnPlacement() {
+        const player = document.getElementById('servePlayer').value;
+        const serveType = document.getElementById('serveType').value;
+        const winner = "{{ player_a }}";
+        const loser = "{{ player_b }}";
+        $.get('/serve_return_placement', {player, serve_type: serveType, winner, loser}, function(data) {
+            plotServeReturnPlacement(data);
+        });
+    }
+
+    // Error Zone Map logic
+    
+    function plotErrorZoneMap(data) {
+        // Update the description based on current selections
+        updateErrorZoneDescription();
+        
+        // If there are no plot points
+        if (!data || !data.hit_x || data.hit_x.length === 0) {
+            let message = 'No unforced error data available for the selected player.';
+            
+            // If we have error counts, add them to the message
+            if (data && data.error_counts && Object.keys(data.error_counts).length > 0) {
+                const counts = Object.entries(data.error_counts)
+                                     .map(([reason, count]) => `${reason.charAt(0).toUpperCase() + reason.slice(1)}: ${count}`)
+                                     .join(', ');
+                message += `<br><small>Error counts for this match: ${counts}</small>`;
+            }
+            
+            document.getElementById('errorZonePlot').innerHTML = `<div class="alert alert-info">${message}</div>`;
+            return;
+        }
+
+        // Create custom hover text that includes both player and error type
+        const hoverText = data.hit_x.map((_, i) => {
+            const player = data.player[i] || 'Unknown';
+            const errorType = data.error_type && data.error_type[i] ? data.error_type[i] : 'Unknown';
+            return `Player: ${player}<br>Error Type: ${errorType}<br>Error Location<br>X: ${data.hit_x[i].toFixed(1)}m<br>Y: ${data.hit_y[i].toFixed(1)}m`;
+        });
+
+        // Define colors and symbols for different error types
+        const errorTypeConfig = {
+            'Net': { color: '#FF6B6B', symbol: 'x', size: 15 },
+            'Out': { color: '#4ECDC4', symbol: 'circle', size: 12 },
+            'Did not cross net': { color: '#45B7D1', symbol: 'diamond', size: 14 },
+            'Landing misjudgment': { color: '#96CEB4', symbol: 'square', size: 13 },
+            'Error': { color: '#FFEAA7', symbol: 'triangle-up', size: 14 }
+        };
+
+        // Group errors by type for separate traces
+        const errorGroups = {};
+        data.hit_x.forEach((x, i) => {
+            const errorType = data.error_type[i] || 'Error';
+            if (!errorGroups[errorType]) {
+                errorGroups[errorType] = { x: [], y: [], hover: [] };
+            }
+            errorGroups[errorType].x.push(x);
+            errorGroups[errorType].y.push(data.hit_y[i]);
+            errorGroups[errorType].hover.push(hoverText[i]);
+        });
+
+        // Create traces for each error type
+        const traces = [];
+        Object.entries(errorGroups).forEach(([errorType, coords]) => {
+            const config = errorTypeConfig[errorType] || errorTypeConfig['Error'];
+            traces.push({
+                x: coords.x,
+                y: coords.y,
+                mode: 'markers',
+                type: 'scatter',
+                name: errorType,
+                marker: {
+                    size: config.size,
+                    color: config.color,
+                    symbol: config.symbol,
+                    opacity: 0.9,
+                    line: { color: 'black', width: 0.5 }
+                },
+                text: coords.hover,
+                hovertemplate: '%{text}<extra></extra>'
+            });
+        });
+
+        // Create layout based on getCourtLayout but with custom title and legend
+        const layout = getCourtLayout();
+        layout.title.text = 'Unforced Error Locations';
+        layout.showlegend = true;
+        layout.legend = {
+            x: 1.02,
+            y: 1,
+            bgcolor: 'rgba(255,255,255,0.8)',
+            bordercolor: 'black',
+            borderwidth: 1,
+            font: { size: 12 }
+        };
+
+        Plotly.newPlot('errorZonePlot', traces, layout, {displayModeBar: false, responsive: true});
+    }
+
+    // Helper to get current context from selects (update IDs as needed)
+    function getCurrentContext() {
+        return {
+            winner: document.getElementById('winnerSelect')?.value || '{{ player_a }}',
+            loser: document.getElementById('loserSelect')?.value || '{{ player_b }}',
+            player: document.getElementById('errorPlayer').value || '',
+            tournament: document.getElementById('tournamentSelect')?.value || '',
+            round: document.getElementById('roundSelect')?.value || ''
+        };
+    }
+
+    function fetchErrorTypes() {
+        const winner = '{{ player_a }}';
+        const loser = '{{ player_b }}';
+        const player = document.getElementById('errorPlayer').value;
+        const set_number = document.getElementById('errorZoneRoundSelect').value;
+        const params = new URLSearchParams({winner, loser, player, set_number});
+
+        fetch(`/get_available_error_types?${params}`)
+            .then(response => response.json())
+            .then(errorTypes => {
+                const select = document.getElementById('errorTypeSelect');
+                select.innerHTML = '<option value="">All Errors</option>'; // Match new default text
+                errorTypes.forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type.value;
+                    option.textContent = type.label;
+                    select.appendChild(option);
+                });
+            });
+    }
+
+    function fetchErrorZoneData() {
+        const winner = '{{ player_a }}';
+        const loser = '{{ player_b }}';
+        const player = document.getElementById('errorPlayer').value;
+        const set_number = document.getElementById('errorZoneRoundSelect').value;
+        const error_type = document.getElementById('errorTypeSelect').value;
+        const params = new URLSearchParams({winner, loser, player, set_number, error_type});
+
+        fetch(`/error_zone_map?${params}`)
+            .then(response => response.json())
+            .then(data => {
+                plotErrorZoneMap(data);
+            });
+    }
+
+    document.getElementById('errorPlayer').addEventListener('change', function() {
+        fetchErrorTypes();
+        fetchErrorZoneData();
+        updateErrorZoneDescription();
+    });
+    document.getElementById('errorTypeSelect').addEventListener('change', function() {
+        fetchErrorZoneData();
+        updateErrorZoneDescription();
+    });
+    document.getElementById('errorZoneRoundSelect').addEventListener('change', function() {
+        fetchErrorTypes(); // Refetch types as they might change with the set
+        fetchErrorZoneData();
+        updateErrorZoneDescription();
+    });
+
+    function plotMovementDensityHeatmap(data) {
+        if (!data || !data.x || !data.y || data.x.length === 0) {
+            document.getElementById('movementDensityPlot').innerHTML = '<div class="alert alert-info">No movement data available for the selected filters.</div>';
+            return;
+        }
+        
+        // Update the description based on current selections
+        updateMovementDensityDescription();
+        
+        // Debug: log data
+        console.log('Movement density data:', data);
+        
+        // Court config
+        const doublesWidth = 6.10;
+        const singlesWidth = 5.18;
+        const singlesMargin = 0.46;
+        const courtLength = 13.4;
+        const yMin = 0;
+        const yMax = doublesWidth;
+        const singlesYMin = singlesMargin;
+        const singlesYMax = singlesMargin + singlesWidth;
+        
+        // Main heatmap trace
+        const heatmapTrace = {
+            x: data.x,
+            y: data.y,
+            type: 'histogram2d',
+            colorscale: 'YlOrRd',
+            nbinsx: 30,
+            nbinsy: 30,
+            colorbar: { title: 'Density' },
+            zauto: true,
+            showscale: true,
+            opacity: 0.85,
+            xbins: { start: 0, end: courtLength, size: courtLength/30 },
+            ybins: { start: 0, end: doublesWidth, size: doublesWidth/30 }
+        };
+        
+        // Use doubles court for layout, singles as dashed
+        const layout = {
+            shapes: [
+                // outer doubles court (solid)
+                { type:'rect', x0:0, x1:courtLength, y0:yMin, y1:yMax, line:{color:'white',width:2} },
+                // inner singles court (dashed)
+                { type:'rect', x0:0, x1:courtLength, y0:singlesYMin, y1:singlesYMax, line:{color:'white',width:2, dash:'dash'} },
+                // net (vertical at X=6.7)
+                { type:'line', x0:courtLength/2, x1:courtLength/2, y0:yMin, y1:yMax, line:{color:'white',width:3} },
+                // center-line (horizontal at Y=center)
+                { type:'line', x0:0, x1:courtLength, y0:yMax/2, y1:yMax/2, line:{color:'white',width:1} },
+                // short service lines (vertical)
+                { type:'line', x0:1.98, y0:yMin, x1:1.98, y1:yMax, line:{color:'white',width:1} },
+                { type:'line', x0:courtLength-1.98, y0:yMin, x1:courtLength-1.98, y1:yMax, line:{color:'white',width:1} }
+            ],
+            annotations: [
+                // Player B (Loser) - Left side of court (outside)
+                {
+                    x: courtLength * 0.25,
+                    y: yMax + 0.5,
+                    text: "{{ player_b }}",
+                    showarrow: false,
+                    font: { color: 'white', size: 14, family: 'Arial' },
+                    bgcolor: 'rgba(0,0,0,0.7)',
+                    bordercolor: 'white',
+                    borderwidth: 1
+                },
+                // Player A (Winner) - Right side of court (outside)
+                {
+                    x: courtLength * 0.75,
+                    y: yMax + 0.5,
+                    text: "{{ player_a }}",
+                    showarrow: false,
+                    font: { color: 'white', size: 14, family: 'Arial' },
+                    bgcolor: 'rgba(0,0,0,0.7)',
+                    bordercolor: 'white',
+                    borderwidth: 1
+                },
+            ],
+            xaxis: {
+                range: [0, courtLength],
+                showgrid: false, zeroline: false, showticklabels: false,
+                scaleanchor:'y', scaleratio:1, fixedrange:true
+            },
+            yaxis: {
+                range: [yMin, yMax + 0.7], // add space for labels
+                showgrid: false, zeroline: false, showticklabels: false,
+                fixedrange: true
+            },
+            plot_bgcolor: '#2c3338',
+            paper_bgcolor: '#2c3338',
+            margin: {t: 50, r: 30, b: 30, l: 30},
+            title: {text: 'Player Movement Density', font: { color: 'white', size: 20 }},
+            width: 800, height: 600
+        };
+        
+        Plotly.newPlot('movementDensityPlot', [heatmapTrace], layout, {displayModeBar: false, responsive: true});
+    }
+
+    // Function to update the movement density description
+    function updateMovementDensityDescription() {
+        const playerSelect = document.getElementById('movementPlayer');
+        const setSelect = document.getElementById('movementRoundSelect');
+        const descriptionDiv = document.getElementById('movementDensityDescription');
+        
+        const selectedPlayer = playerSelect.value || 'All Players';
+        const selectedSet = setSelect.value || 'All Sets';
+        
+        let setText = '';
+        if (selectedSet !== 'All Sets') {
+            setText = ` during Set ${selectedSet}`;
+        }
+        
+        let description = `<strong>What it tells us:</strong><br>`;
+        description += `This heatmap visualizes where ${selectedPlayer} spends the most time while hitting the shuttle${setText}. The court is divided into a grid, with warmer colors indicating higher activity.<br><br>`;
+        description += `<strong>Color Interpretation:</strong><br>`;
+        description += `🔴 Red Zones: Low movement frequency<br>`;
+        description += `🟠 Orange Zones: Moderate activity<br>`;
+        description += `🟡 Yellow Zones: High-density zones — areas where the player hits most often`;
+        
+        descriptionDiv.innerHTML = description;
+    }
+
+    function fetchMovementDensityHeatmap() {
+        const player = document.getElementById('movementPlayer').value;
+        const winner = '{{ player_a }}';
+        const loser = '{{ player_b }}';
+        const set_number = document.getElementById('movementRoundSelect').value;
+        const params = new URLSearchParams({
+            player: player,
+            winner: winner,
+            loser: loser,
+            set_number: set_number
+        });
+        fetch(`/movement_density_heatmap?${params}`)
+            .then(response => response.json())
+            .then(data => {
+                plotMovementDensityHeatmap(data);
+            });
+    }
+
+    document.getElementById('movementPlayer').addEventListener('change', fetchMovementDensityHeatmap);
+    document.getElementById('movementRoundSelect').addEventListener('change', fetchMovementDensityHeatmap);
+
+    function fetchShotTypeSpatialSignature() {
+      const player    = document.getElementById('spatialSignaturePlayer').value;
+      const shot_type = document.getElementById('spatialSignatureShotType').value;
+      const winner    = "{{ player_a }}";
+      const loser     = "{{ player_b }}";
+      const set_number= document.getElementById('spatialSignatureRoundSelect').value;
+      const params    = new URLSearchParams({ player, shot_type, winner, loser, set_number });
+
+      fetch(`/shot_type_spatial_signature?${params}`)
+        .then(r => r.json())
+        .then(data => {
+          console.log('Received data:', data);
+          plotShotTypeSpatialSignature(data);
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+          document.getElementById('spatialSignaturePlot').innerHTML =
+            '<div class="alert alert-danger">Error loading data. Please try again.</div>';
+        });
+    }
+
+    function plotShotTypeSpatialSignature(data) {
+      console.log('Plotting data:', data);
+      
+      if (!data?.hit_x?.length) {
+        document.getElementById('spatialSignaturePlot').innerHTML =
+          '<div class="alert alert-info">No shot trajectory data available for the selected filters.</div>';
+        return;
+      }
+
+      // Update the description based on current selections
+      updateSpatialSignatureDescription();
+
+      // convert all points into court coordinates
+      const pts = convertDataPoints(data);
+      console.log('Converted points:', pts);
+      
+      if (pts.length === 0) {
+        document.getElementById('spatialSignaturePlot').innerHTML =
+          '<div class="alert alert-info">No valid coordinate data found.</div>';
+        return;
+      }
+
+      const hitX    = pts.map(d => d.hx), hitY = pts.map(d => d.hy);
+      const landX   = pts.map(d => d.lx), landY = pts.map(d => d.ly);
+      const types   = pts.map(d => d.shotType);
+
+      // traces
+      const hitTrace = {
+        x: hitX, y: hitY, mode:'markers', type:'scatter',
+        name:'Shot Origin',
+        marker:{ size:8, color:'#ff6b6b', opacity:0.8, line:{color:'white',width:1} },
+        text: types,
+        hovertemplate:'Origin<br>Type:%{text}<br>X:%{x:.1f}m<br>Y:%{y:.1f}m<extra></extra>'
+      };
+
+      const landingTrace = {
+        x: landX, y: landY, mode:'markers', type:'scatter',
+        name:'Shot Landing',
+        marker:{ size:8, color:'#4ecdc4', opacity:0.8, line:{color:'white',width:1} },
+        text: types,
+        hovertemplate:'Landing<br>Type:%{text}<br>X:%{x:.1f}m<br>Y:%{y:.1f}m<extra></extra>'
+      };
+
+      const arrowTraces = pts.map(d => ({
+        x: [d.hx, d.lx], y: [d.hy, d.ly],
+        mode:'lines', type:'scatter',
+        line:{ color:'rgba(255,255,255,0.3)', width:1 },
+        showlegend:false, hoverinfo:'skip'
+      }));
+
+      console.log('Creating plot with traces:', [hitTrace, landingTrace, ...arrowTraces]);
+
+      Plotly.newPlot(
+        'spatialSignaturePlot',
+        [ hitTrace, landingTrace, ...arrowTraces ],
+        getCourtLayout(),
+        { displayModeBar:false, responsive:true }
+      );
+    }
+
+    // Function to update the spatial signature description
+    function updateSpatialSignatureDescription() {
+      const playerSelect = document.getElementById('spatialSignaturePlayer');
+      const shotTypeSelect = document.getElementById('spatialSignatureShotType');
+      const setSelect = document.getElementById('spatialSignatureRoundSelect');
+      const descriptionDiv = document.getElementById('spatialSignatureDescription');
+      
+      const selectedPlayer = playerSelect.value || 'All Players';
+      const selectedShotType = shotTypeSelect.value || 'All Shot Types';
+      const selectedSet = setSelect.value || 'All Sets';
+      
+      let setText = '';
+      if (selectedSet !== 'All Sets') {
+        setText = ` during Set ${selectedSet}`;
+      }
+      
+      let description = `<strong>What it tells us:</strong><br>`;
+      description += `This court map illustrates the spatial pattern of all "${selectedShotType}" shots played by ${selectedPlayer}${setText}. It tracks the complete path of each shot from its origin to its landing location.<br><br>`;
+      description += `<strong>Legend:</strong><br>`;
+      description += `🔴 Red: Shot origin (where the player hit the shuttle)<br>`;
+      description += `🔵 Blue: Shot landing (where the shuttle touched down)<br><br>`;
+      description += `Lines connect the origin and landing points to clearly show shot direction, depth, and court coverage.`;
+      
+      descriptionDiv.innerHTML = description;
+    }
+
+    // Function to update the error zone description
+    function updateErrorZoneDescription() {
+      const playerSelect = document.getElementById('errorPlayer');
+      const errorTypeSelect = document.getElementById('errorTypeSelect');
+      const setSelect = document.getElementById('errorZoneRoundSelect');
+      const descriptionDiv = document.getElementById('errorZoneDescription');
+      
+      const selectedPlayer = playerSelect.value || 'All Players';
+      const selectedErrorType = errorTypeSelect.value || 'All Errors';
+      const selectedSet = setSelect.value || 'All Sets';
+      
+      // Map error type value to English label for display
+      const errorTypeMap = {
+        '掛網': 'Net',
+        '出界': 'Out',
+        '未過網': 'Did not cross net',
+        '落點判斷失誤': 'Landing misjudgment',
+        'error': 'Error',
+        'net': 'Net',
+        'out': 'Out',
+        'Not Over Net': 'Did not cross net',
+        'All Errors': 'All Errors'
+      };
+      let errorTypeText = '';
+      if (selectedErrorType !== 'All Errors') {
+        const displayErrorType = errorTypeMap[selectedErrorType] || selectedErrorType;
+        errorTypeText = ` for ${displayErrorType} errors`;
+      }
+      let setText = '';
+      if (selectedSet !== 'All Sets') {
+        setText = ` during Set ${selectedSet}`;
+      }
+      let description = `<strong>What it tells us:</strong><br>`;
+      description += `This chart visualizes unforced error locations on the court for ${selectedPlayer}${errorTypeText}${setText}, categorized by error type.<br><br>`;
+      description += `<strong>Error Categories:</strong><br>`;
+      description += `❌ Net errors (red cross)<br>`;
+      description += `🔷 Did not cross net (blue diamond)<br>`;
+      description += `🟢 Out (light teal circles)<br><br>`;
+      description += `Each marker's position corresponds to where the shot landed or failed, allowing stakeholders to detect error concentration zones and identify court regions requiring tactical/technical improvement.`;
+      descriptionDiv.innerHTML = description;
+    }
+
+    // Function to update the rally end zone description
+    function updateRallyEndZoneDescription() {
+      const setSelect = document.getElementById('rallyEndZoneRoundSelect');
+      const descriptionDiv = document.getElementById('rallyEndZoneDescription');
+      
+      const selectedSet = setSelect.value || 'All Sets';
+      
+      let setText = '';
+      if (selectedSet !== 'All Sets') {
+        setText = ` during Set ${selectedSet}`;
+      } else {
+        setText = ` across all sets`;
+      }
+      
+      let description = `<strong>What it tells us:</strong><br>`;
+      description += `This visual displays the locations where rallies ended${setText}. Each dot on the court represents a final shot landing position, with its color indicating the length of the rally.<br><br>`;
+      description += `<strong>Color Scale:</strong><br>`;
+      description += `🟥 Darker Red = Short rallies (1-5 shots)<br>`;
+      description += `🟨 Lighter Yellow = Longer rallies (20+ shots)<br><br>`;
+      description += `When hovered, each point shows rally length, win reason, and set number.`;
+      
+      descriptionDiv.innerHTML = description;
+    }
+
+    // Function to update the serve return description
+    function updateServeReturnDescription() {
+      const playerSelect = document.getElementById('servePlayer');
+      const serveTypeSelect = document.getElementById('serveType');
+      const descriptionDiv = document.getElementById('serveReturnDescription');
+      
+      const selectedPlayer = playerSelect.value || 'All Players';
+      const selectedServeType = serveTypeSelect.value || 'All Serve Types';
+      
+      let serveTypeText = '';
+      if (selectedServeType !== 'All Serve Types') {
+        serveTypeText = ` for ${selectedServeType}`;
+      }
+      
+      let description = `<strong>What it tells us:</strong><br>`;
+      description += `This visual shows the landing positions of ${selectedPlayer}'s serves or returns${serveTypeText}. Each blue dot represents where the shuttle landed after the serve or return during gameplay.<br><br>`;
+      description += `<strong>What it shows:</strong><br>`;
+      description += `🎯 Serve accuracy and depth – Placement close to baseline vs midcourt<br>`;
+      description += `🧠 Tactical preferences – Serving to backhand, forehand, or center zones<br>`;
+      description += `📊 Consistency – Cluster tightness reflects control and reliability`;
+      
+      descriptionDiv.innerHTML = description;
+    }
+
+    // Function to update the shot heatmap description
+    function updateShotHeatmapDescription() {
+      const setSelect = document.getElementById('shotHeatmapSetSelect');
+      const descriptionDiv = document.getElementById('shotHeatmapDescription');
+      
+      const selectedSet = setSelect.value || 'All Sets';
+      
+      let setText = '';
+      if (selectedSet !== 'All Sets') {
+        setText = ` during Set ${selectedSet}`;
+      } else {
+        setText = ` across all sets`;
+      }
+      
+      let description = `<strong>What it tells us:</strong><br>`;
+      description += `This chart maps the landing positions of shots where the player won the rally or where the opponent committed an error${setText}, revealing the most effective target zones.<br><br>`;
+      description += `<strong>Legend:</strong><br>`;
+      description += `🟢 Winner (green): Shuttle landed and won the point<br>`;
+      description += `🔵 Opponent out (blue): Opponent hit it out<br>`;
+      description += `🔴 Opponent net (pink): Opponent hit into net<br>`;
+      description += `🟠 Opponent did not cross net (orange): Opponent couldn't return`;
+      
+      descriptionDiv.innerHTML = description;
+    }
+
+    function fetchRallyEndZoneData() {
+        const winner = '{{ player_a }}';
+        const loser = '{{ player_b }}';
+        const set_number = document.getElementById('rallyEndZoneRoundSelect').value;
+        const params = new URLSearchParams({winner, loser, set_number});
+        
+        fetch(`/rally_end_zone?${params}`)
+            .then(response => response.json())
+            .then(data => {
+                plotRallyEndZoneData(data);
+            });
+    }
+
+    function plotRallyEndZoneData(data) {
+        // Update the description based on current selections
+        updateRallyEndZoneDescription();
+        
+        console.log('Rally-End Zone data:', data);
+        if (!data || !data.landing_x || data.landing_x.length === 0) {
+            document.getElementById('rallyEndZonePlot').innerHTML = '<div class="alert alert-info">No rally-end data available for the selected filters.</div>';
+            return;
+        }
+
+        // Use the same court config as shot type spatial signature
+        const court = {
+          doublesWidth: 6.10,
+          singlesWidth: 5.18,
+          length:        13.40,
+          serviceDist:   1.98,
+          margin:        (6.10 - 5.18) / 2
+        };
+
+        const trace = {
+            x: data.landing_x,
+            y: data.landing_y,
+            mode: 'markers',
+            type: 'scatter',
+            marker: {
+                color: data.rally_length, // color by rally length
+                colorscale: 'YlOrRd',
+                colorbar: {
+                    title: 'Rally Length (shots)'
+                },
+                size: 10,
+                opacity: 0.8
+            },
+            text: data.rally_length.map((len, i) => 
+                `Rally Length: ${len}<br>Win Reason: ${data.win_reason[i]}<br>Set: ${data.set_number[i]}`
+            ),
+            hovertemplate: '%{text}<extra></extra>'
+        };
+
+        // Use the same layout as shot type spatial signature (rotated court)
+        const layout = {
+          shapes: [
+            // outer (doubles) court - ROTATED: width is Y, length is X
+            { type:'rect', x0:0, x1:court.length, y0:0, y1:court.doublesWidth, line:{color:'white',width:2} },
+            // inner singles court - ROTATED
+            { type:'rect',
+              x0:0,            x1:court.length,
+              y0:court.margin, y1:court.doublesWidth-court.margin,
+              line:{color:'white',width:2}
+            },
+            // net - ROTATED: now horizontal
+            { type:'line',
+              x0:court.length/2, x1:court.length/2,
+              y0:0, y1:court.doublesWidth,
+              line:{color:'white',width:3}
+            },
+            // center-line - ROTATED: now vertical
+            { type:'line',
+              x0:0, x1:court.length,
+              y0:court.doublesWidth/2, y1:court.doublesWidth/2,
+              line:{color:'white',width:1}
+            },
+            // short service lines - ROTATED
+            { type:'line',
+              x0:court.serviceDist, y0:court.margin,
+              x1:court.serviceDist, y1:court.doublesWidth-court.margin,
+              line:{color:'white',width:1}
+            },
+            { type:'line',
+              x0:court.length-court.serviceDist,
+              y0:court.margin,
+              x1:court.length-court.serviceDist,
+              y1:court.doublesWidth-court.margin,
+              line:{color:'white',width:1}
+            }
+          ],
+          annotations: [
+            // Player B (Loser) - Left side of court (outside)
+            {
+              x: court.length * 0.25,
+              y: court.doublesWidth + 0.8,
+              text: "{{ player_b }}",
+              showarrow: false,
+              font: { color: 'white', size: 14, family: 'Arial' },
+              bgcolor: 'rgba(0,0,0,0.7)',
+              bordercolor: 'white',
+              borderwidth: 1
+            },
+            // Player A (Winner) - Right side of court (outside)
+            {
+              x: court.length * 0.75,
+              y: court.doublesWidth + 0.8,
+              text: "{{ player_a }}",
+              showarrow: false,
+              font: { color: 'white', size: 14, family: 'Arial' },
+              bgcolor: 'rgba(0,0,0,0.7)',
+              bordercolor: 'white',
+              borderwidth: 1
+            },
+          ],
+          xaxis: {
+            range: [0, court.length],
+            showgrid:false, zeroline:false, showticklabels:false,
+            scaleanchor:'y', scaleratio:1, fixedrange:true
+          },
+          yaxis: {
+            range: [0, court.doublesWidth + 1.2],  // Extended to accommodate labels
+            showgrid:false, zeroline:false, showticklabels:false,
+            fixedrange:true
+          },
+          plot_bgcolor:'#2c3338',
+          paper_bgcolor:'#2c3338',
+          margin:{t:50,r:30,b:30,l:30},
+          title:{ text:'Rally-End Zone Analysis', font:{ color:'white', size:20 }},
+          width:800, height:600
+        };
+
+        Plotly.newPlot('rallyEndZonePlot', [trace], layout, {displayModeBar: false, responsive: true});
+    }
+
+    // Add JS to fetch and update heatmap on set change
+    function fetchShotLandingHeatmap() {
+        const set_number = document.getElementById('shotHeatmapSetSelect').value;
+        const player = "{{ player_a }}";
+        const opponent = "{{ player_b }}";
+        const tournament = "{{ tournament }}";
+        const round = "{{ round }}";
+        const params = new URLSearchParams({
+            player: player,
+            opponent: opponent,
+            tournament: tournament,
+            round_name: round,
+            set_number: set_number
+        });
+        fetch(`/shot_heatmap?${params}`)
+            .then(response => response.json())
+            .then(data => {
+                createHeatmap(data);
+            });
+    }
+
+    // ────────── Configuration ────────── //
+    const court = {
+      doublesWidth: 6.10,
+      singlesWidth: 5.18,
+      length:        13.40,
+      serviceDist:   1.98,
+      margin:        (6.10 - 5.18) / 2
+    };
+
+    // ────────── Utility Functions ────────── //
+
+    // Convert raw pixel coordinates to court coordinates using the same scaling as backend
+    function convertDataPoints(data) {
+      if (!data || !data.hit_x || !data.hit_y || !data.landing_x || !data.landing_y) {
+        console.error('Missing coordinate data:', data);
+        return [];
+      }
+
+      // The backend has already scaled the coordinates to court dimensions
+      // So we can use them directly
+      console.log('Using pre-scaled coordinates from backend');
+      console.log('Coordinate ranges:', {
+        hitX: { min: Math.min(...data.hit_x), max: Math.max(...data.hit_x) },
+        hitY: { min: Math.min(...data.hit_y), max: Math.max(...data.hit_y) },
+        landX: { min: Math.min(...data.landing_x), max: Math.max(...data.landing_x) },
+        landY: { min: Math.min(...data.landing_y), max: Math.max(...data.landing_y) }
+      });
+
+      return data.hit_x.map((_, i) => {
+        return { 
+          hx: data.hit_x[i],
+          hy: data.hit_y[i], 
+          lx: data.landing_x[i],
+          ly: data.landing_y[i],
+          shotType: data.shot_types ? data.shot_types[i] : 'Unknown' 
+        };
+      });
+    }
+
+    // Build your Plotly layout with a perfectly-scaled singles court (ROTATED 90 degrees)
+    function getCourtLayout() {
+      return {
+        shapes: [
+          // outer (doubles) court - ROTATED: width is Y, length is X
+          { type:'rect', x0:0, x1:court.length, y0:0, y1:court.doublesWidth, line:{color:'white',width:2} },
+          // inner singles court - ROTATED
+          { type:'rect',
+            x0:0,            x1:court.length,
+            y0:court.margin, y1:court.doublesWidth-court.margin,
+            line:{color:'white',width:2}
+          },
+          // net - ROTATED: now horizontal
+          { type:'line',
+            x0:court.length/2, x1:court.length/2,
+            y0:0, y1:court.doublesWidth,
+            line:{color:'white',width:3}
+          },
+          // center-line - ROTATED: now vertical
+          { type:'line',
+            x0:0, x1:court.length,
+            y0:court.doublesWidth/2, y1:court.doublesWidth/2,
+            line:{color:'white',width:1}
+          },
+          // short service lines - ROTATED
+          { type:'line',
+            x0:court.serviceDist, y0:court.margin,
+            x1:court.serviceDist, y1:court.doublesWidth-court.margin,
+            line:{color:'white',width:1}
+          },
+          { type:'line',
+            x0:court.length-court.serviceDist,
+            y0:court.margin,
+            x1:court.length-court.serviceDist,
+            y1:court.doublesWidth-court.margin,
+            line:{color:'white',width:1}
+          }
+        ],
+        annotations: [
+          // Player B (Loser) - Left side of court (outside)
+          {
+            x: court.length * 0.25,  // Quarter way from left
+            y: court.doublesWidth + 0.8,  // Above court
+            text: "{{ player_b }}",
+            showarrow: false,
+            font: { color: 'white', size: 14, family: 'Arial' },
+            bgcolor: 'rgba(0,0,0,0.7)',
+            bordercolor: 'white',
+            borderwidth: 1
+          },
+          // Player A (Winner) - Right side of court (outside)
+          {
+            x: court.length * 0.75,  // Quarter way from right
+            y: court.doublesWidth + 0.8,  // Above court
+            text: "{{ player_a }}",
+            showarrow: false,
+            font: { color: 'white', size: 14, family: 'Arial' },
+            bgcolor: 'rgba(0,0,0,0.7)',
+            bordercolor: 'white',
+            borderwidth: 1
+          },
+        ],
+        xaxis: {
+          range: [0, court.length],
+          showgrid:false, zeroline:false, showticklabels:false,
+          scaleanchor:'y', scaleratio:1, fixedrange:true
+        },
+        yaxis: {
+          range: [0, court.doublesWidth + 1.2],  // Extended to accommodate labels
+          showgrid:false, zeroline:false, showticklabels:false,
+          fixedrange:true
+        },
+        plot_bgcolor:'#2c3338',
+        paper_bgcolor:'#2c3338',
+        margin:{t:50,r:30,b:30,l:30},
+        title:{ text:'Shot Type Spatial Signature', font:{ color:'white', size:20 }},
+        width:800, height:600,
+        legend:{
+          x:0.02,y:0.98,
+          bgcolor:'white',
+          bordercolor:'white',borderwidth:1,
+          text: { color: 'black' }
+        }
+      };
+    }
+
+    // ────────── Data & Plotting ────────── //
+
+    function fetchAvailableShotTypes() {
+      const player    = document.getElementById('spatialSignaturePlayer').value;
+      const winner    = "{{ player_a }}";
+      const loser     = "{{ player_b }}";
+      const set_number= document.getElementById('spatialSignatureRoundSelect').value;
+      const params    = new URLSearchParams({ player, winner, loser, set_number });
+
+      fetch(`/get_available_shot_types?${params}`)
+        .then(r => r.json())
+        .then(shotTypes => {
+          const sel = document.getElementById('spatialSignatureShotType');
+          sel.innerHTML = 
+            '<option value="">All Shot Types</option>' +
+            shotTypes.map(t => `<option value="${t}">${t}</option>`).join('');
+        });
+    }
+    </script>
+</body>
+</html>
