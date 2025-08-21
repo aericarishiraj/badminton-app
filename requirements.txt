@@ -1,0 +1,11 @@
+# Use version ranges for better cross-platform compatibility (especially macOS ARM64)
+Flask==3.0.0
+numpy>=1.26.0
+pandas>=2.2.0
+matplotlib>=3.8.0
+seaborn>=0.13.0
+scipy>=1.11.0
+networkx>=3.2.0
+opencv-python>=4.9.0
+requests>=2.31.0
+gunicorn>=21.0.0
